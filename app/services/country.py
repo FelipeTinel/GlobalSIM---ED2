@@ -1,4 +1,4 @@
-class CountryService:
+class CountriesManager:
 
     def __init__(self):
         self.countries: dict[str, dict] = {}
