@@ -2,7 +2,6 @@
 
 ## Como baixar dependências Python:
 
-
 Cria o ambiente:
 ```bash
 python3 -m venv venv
