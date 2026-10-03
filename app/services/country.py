@@ -3,7 +3,7 @@ class CountriesManager:
     def __init__(self):
         self.countries: dict[str, dict] = {}
 
-    def register(self, key: str, country: dict) -> bool:
+    def create(self, key: str, country: dict) -> bool:
         
         if key in self.countries:
             return False
@@ -19,7 +19,7 @@ class CountriesManager:
         self.countries[key] = country
         return True
 
-    def delete(self, key: str) _> bool:
+    def delete(self, key: str) -> bool:
         
         if key in self.countries:
             del self.countries[key]
