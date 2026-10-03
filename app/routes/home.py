@@ -4,4 +4,6 @@ home_bp = Blueprint('home', __name__)
 
 @home_bp.route('/')
 def index():
-    return render_template("index.html")
+    initial_point = {"lat": -12.9714, "lng": -38.5014, "zoom": 13}
+    
+    return render_template('index.html', point=initial_point)

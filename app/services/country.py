@@ -1,7 +1,7 @@
 class CountriesManager:
 
     def __init__(self):
-        self.countries: dict[str, dict] = {}
+        self.countries: dict[str, dict[str, str]] = {}
 
     def create(self, key: str, country: dict) -> bool:
         
