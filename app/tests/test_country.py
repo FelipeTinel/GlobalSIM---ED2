@@ -1,5 +1,5 @@
 import pytest
-from services.country import CountriesManager, Country
+from app.models.country import CountriesManager, Country
 
 
 @pytest.fixture

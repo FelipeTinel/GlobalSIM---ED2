@@ -16,17 +16,21 @@ class CountriesManager:
         if not key.strip():
             raise ValueError('Não pode chave vazia')
 
+        if not country.get("code", "").strip():
+            raise ValueError('Código inválido')
+
         if key in self.countries:
             raise KeyError('País existente')
         self.countries[key] = country
 
     def update(self, key: str, country: Country) -> None:      
-        if not key in self.countries:
+        if key not in self.countries:
             raise KeyError('País não existente')
         self.countries[key] = country
 
     def delete(self, key: str) -> None: 
         if key in self.countries:
             del self.countries[key]
-        raise KeyError('País não existente')
+        else:
+            raise KeyError('País não existente')
         
