@@ -12,23 +12,21 @@ class CountriesManager:
     def __init__(self):
         self.countries: dict[str, Country] = {}
 
-    def create(self, key: str, country: Country) -> bool:     
+    def create(self, key: str, country: Country) -> None: 
+        if not key.strip():
+            raise ValueError('Não pode chave vazia')
+
         if key in self.countries:
-            return False
-        
+            raise KeyError('País existente')
         self.countries[key] = country
-        return True
 
-    def update(self, key: str, country: Country) -> bool:      
+    def update(self, key: str, country: Country) -> None:      
         if not key in self.countries:
-            return False        
-        
+            raise KeyError('País não existente')
         self.countries[key] = country
-        return True
 
-    def delete(self, key: str) -> bool: 
+    def delete(self, key: str) -> None: 
         if key in self.countries:
             del self.countries[key]
-            return True
+        raise KeyError('País não existente')
         
-        return False
