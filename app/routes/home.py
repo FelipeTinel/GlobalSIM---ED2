@@ -10,14 +10,13 @@ def index():
 
 @home_bp.route('/api/countries', methods=['GET'])
 def list_countries():
-    countries = {"contries" : "countries"}
-    return jsonify(countries)
+    pass
 
 @home_bp.route('/api/countries/<int:country_id>', methods=['GET'])
 def get_country(country_id):
-    return 
+    pass 
 
 @home_bp.route('/api/users/<int:user_id>/country', methods=['POST'])
 def select_country(user_id):
-    return {"message" : "sucess"}
+    pass
 
