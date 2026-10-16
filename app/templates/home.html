@@ -4,13 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GlobalSIM</title>
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script defer src="../static/js/map.js"></script>
-    <style src="../static/css/style.css"></style>
+    <script>
+        window.initialPoint = {{ point | tojson }};
+    </script>
+    <script defer type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </head>
 <body>
     <h1>GlobalSIM</h1>
-    <div class="map"></div>
+    <div align=center id="map"></div>
 </body>
 </html>
