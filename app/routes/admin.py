@@ -21,8 +21,8 @@ def create_country():
     # Recebe todas as informações de um país, inclusive coordenadas (depois vejo como trato melhor isso).
     pass
 
-@admin_bp.route('/api/countries/update', methods=['PUT'])
-def update_country():
+@admin_bp.route('/api/countries/<int:country_id>', methods=['PUT'])
+def update_country(country_id):
     # Recebe, novamente, todos os dados de um país, mas dessa vez você só atualiza o do ID informado.
     pass
 
