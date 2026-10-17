@@ -8,20 +8,25 @@ def admin_page():
 
 @admin_bp.route('/api/countries', methods=['GET'])
 def get_countries():
+    # Retorno dos nomes e IDs de todos os países.
     pass
 
 @admin_bp.route('/api/countries/<int:country_id>', methods=['GET'])
 def get_country(country_id):
+    # Retorno de todos os dados, exceto coordenadas, do país do ID informado.
     pass
 
-@admin_bp.route('/api/countries/create', methods=['POST'])
+@admin_bp.route('/api/countries', methods=['POST'])
 def create_country():
+    # Recebe todas as informações de um país, inclusive coordenadas (depois vejo como trato melhor isso).
     pass
 
 @admin_bp.route('/api/countries/update', methods=['PUT'])
 def update_country():
+    # Recebe, novamente, todos os dados de um país, mas dessa vez você só atualiza o do ID informado.
     pass
 
-@admin_bp.route('/api/countries/delete', methods=['DELETE'])
+@admin_bp.route('/api/countries', methods=['DELETE'])
 def delete_country():
+    # Recebe um ID e você vrau.
     pass
