@@ -1,16 +1,7 @@
-from typing import TypedDict
+from typing import Any, TypedDict
+from app.models.hash_table import HashTable
 from app.repository.country import CountryRepository
 
-"""
-OBS DE FELIPE TINEL EI EI AQUI EI!!!!!!!!!!11111! OLHA AQUI!!!1
-
-Eu antes tinha feito a lógica somente pra funcionar a base de dicionários, coisa que não é mais
-tãããããão dessa forma assim porque estamos nos comunicando diretamente com dataframes do pandas
-agora. Nesse caso, vamos ter que reformular. Já importei ali o CountryRepository no construtor,
-só falta implementar a lógica de criação de entidades, consultas e retornos de dicionários pro
-routes.
-
-"""
 
 class Country(TypedDict):
     code: str
@@ -21,29 +12,50 @@ class Country(TypedDict):
 
 class CountriesManager:
 
-    def __init__(self):
-        self.countries: dict[str, Country] = {}
-        self.repo = CountryRepository()
+    def __init__(self, filepath: str | None = "app/data/countries.json", capacity: int = 11):
+        self.countries = HashTable(capacity=capacity)
+        self.repo = CountryRepository(filepath) if filepath else None
 
-    def create(self, key: str, country: Country) -> None: 
-        if not key.strip():
-            raise ValueError('Não pode chave vazia')
+        if self.repo:
+            self._load_from_json()
+
+    def _load_from_json(self) -> None:
+        saved_countries = self.repo.load_all()
+        for item in saved_countries:
+            code = item.get("code", "").strip()
+            if code and code not in self.countries:
+                self.countries.insert(code, item)
+
+    def _persist(self) -> None:
+        if self.repo:
+            self.repo.save_all(self.countries.get_all())
+
+    def create(self, key: str, country: Country) -> None:
+        if not key or not key.strip():
+            raise ValueError("Não pode chave vazia")
 
         if not country.get("code", "").strip():
-            raise ValueError('Código inválido')
+            raise ValueError("Código inválido")
 
-        if key in self.countries:
-            raise KeyError('País existente')
-        self.countries[key] = country
+        self.countries.insert(key, country)
+        self._persist()
 
-    def update(self, key: str, country: Country) -> None:      
-        if key not in self.countries:
-            raise KeyError('País não existente')
-        self.countries[key] = country
+    def get(self, key: str) -> Country | None:
+        return self.countries.get(key)
 
-    def delete(self, key: str) -> None: 
-        if key in self.countries:
-            del self.countries[key]
-        else:
-            raise KeyError('País não existente')
-        
+    def get_all(self) -> list[Country]:
+        return self.countries.get_all()
+
+    def update(self, key: str, country: Country) -> None:
+        if not country.get("code", "").strip():
+            raise ValueError("Código inválido")
+
+        self.countries.update(key, country)
+        self._persist()
+
+    def delete(self, key: str) -> None:
+        self.countries.delete(key)
+        self._persist()
+
+    def get_instrumentation(self) -> dict[str, Any]:
+        return self.countries.get_instrumentation()
