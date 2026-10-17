@@ -20,13 +20,16 @@ def index():
 
 @home_bp.route('/api/countries', methods=['GET'])
 def list_countries():
+    # Retorno de ID, nome do país e coordenadas de todos os países presentes no sistema.
     pass
 
 @home_bp.route('/api/countries/<int:country_id>', methods=['GET'])
 def get_country(country_id):
+    # Retorno de todas as informações do país ID selecionado, menos as coordenadas.
     pass 
 
 @home_bp.route('/api/users/<int:user_id>/country', methods=['POST'])
 def select_country(user_id):
+    # Acho que isso aqui não precisa por enquanto, deixa baixo.
     pass
 

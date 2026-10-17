@@ -2,11 +2,11 @@ export async function initMap () {
 
     const point = window.initialPoint || { lat: 0, lng: 0, zoom: 4 };
 
-    const map = L.map('map', { zoomControl: false }).setView([point.lat, point.lng], point.zoom);
+    const map = L.map('map', { zoomControl : false }).setView([point.lat, point.lng], point.zoom);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        minZoom: 3,
-        maxZoom: 3,
+        minZoom: 4,
+        maxZoom: 4,
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
