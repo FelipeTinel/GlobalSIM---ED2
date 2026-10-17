@@ -1,0 +1,59 @@
+[
+    {
+        "code": "BR",
+        "country": "Brasil",
+        "continent": "América do Sul",
+        "provider": "Operadora BR",
+        "tech": "5G"
+    },
+    {
+        "code": "PT",
+        "country": "Portugal",
+        "continent": "Europa",
+        "provider": "Operadora PT",
+        "tech": "5G"
+    },
+    {
+        "code": "ES",
+        "country": "Espanha",
+        "continent": "Europa",
+        "provider": "Operadora ES",
+        "tech": "5G"
+    },
+    {
+        "code": "FR",
+        "country": "França",
+        "continent": "Europa",
+        "provider": "Operadora FR",
+        "tech": "5G"
+    },
+    {
+        "code": "IT",
+        "country": "Itália",
+        "continent": "Europa",
+        "provider": "Operadora IT",
+        "tech": "5G"
+    },
+    {
+        "code": "US",
+        "country": "Estados Unidos",
+        "continent": "América do Norte",
+        "provider": "Operadora US",
+        "tech": "5G"
+    },
+    {
+        "code": "CA",
+        "country": "Canadá",
+        "continent": "América do Norte",
+        "provider": "Operadora CA",
+        "tech": "5G"
+    },
+    {
+        "code": "JP",
+        "country": "Japão",
+        "continent": "Ásia",
+        "provider": "Operadora JP",
+        "tech": "5G"
+    }
+]
+
