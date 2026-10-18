@@ -9,7 +9,7 @@ class Country(TypedDict):
     continent: str
     provider: str
     tech: str
-    coordinates: str
+    coordinates: tuple[float, float]
 
 class CountriesManager:
 

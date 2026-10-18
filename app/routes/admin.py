@@ -1,5 +1,5 @@
 from app.models.country import countries_manager
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 
 admin_bp = Blueprint('admin',__name__, url_prefix='/admin')
 
@@ -15,7 +15,20 @@ def get_countries():
 @admin_bp.route('/api/countries/<int:country_id>', methods=['GET'])
 def get_country(country_id):
     # Retorno de todos os dados, exceto coordenadas, do país do ID informado.
-    pass
+    country = countries_manager.get(country_id)
+
+    if not country:
+        return jsonify({"error": "Country not found"}), 404
+
+    country_info = {
+        "code": country.code,
+        "country": country.country,
+        "continent": country.continent,
+        "provider": country.provider,
+        "tech": country.tech
+    }
+
+    return jsonify(country_info), 200
 
 @admin_bp.route('/api/countries', methods=['POST'])
 def create_country():
