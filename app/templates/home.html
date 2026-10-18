@@ -7,11 +7,12 @@
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/map.css') }}" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         window.initialPoint = {{ point | tojson }};
     </script>
-    <script defer type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script defer type="module" src="{{ url_for('static', filename='js/home.js') }}"></script>
 </head>
 <body>
     <h1>GlobalSIM</h1>
