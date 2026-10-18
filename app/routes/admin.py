@@ -1,3 +1,4 @@
+from app.models.country import CountriesManager
 from flask import Blueprint, render_template, request, redirect, url_for
 
 admin_bp = Blueprint('admin',__name__, url_prefix='/admin')
@@ -24,18 +25,18 @@ def create_country():
     continent = request.form.get('continent')
     provider = request.form.get('provider')
     tech = request.form.get('tech')
-    # coordenadas = request.form.get('coordenadas') 
-    # verificar se coordernadas serão utilizadas
+    coordinates = request.form.get('coordinates') 
 
     new_country = {
         "code": code,
         "country": country,
         "continent": continent,
         "provider": provider,
-        "tech": tech
+        "tech": tech,
+        "coordinates": coordinates
     }
 
-    #todo: chamar pra inserir na tabela 
+    CountriesManager.create(key=new_country.code, country=new_country)
 
     return redirect(url_for('admin.get_countries'))
 
