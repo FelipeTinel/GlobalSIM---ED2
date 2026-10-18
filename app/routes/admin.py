@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, redirect, url_for
 
 admin_bp = Blueprint('admin',__name__, url_prefix='/admin')
 
@@ -19,7 +19,25 @@ def get_country(country_id):
 @admin_bp.route('/api/countries', methods=['POST'])
 def create_country():
     # Recebe todas as informações de um país, inclusive coordenadas (depois vejo como trato melhor isso).
-    pass
+    code = request.form.get('code')
+    country = request.form.get('country')
+    region = request.form.get('region')
+    provider = request.form.get('provider')
+    tech = request.form.get('tech')
+    # coordenadas = request.form.get('coordenadas') 
+    # verificar se coordernadas serão utilizadas
+
+    new_country = {
+        "code": code,
+        "country": country,
+        "region": region,
+        "provider": provider,
+        "tech": tech
+    }
+
+    #todo: chamar pra inserir na tabela 
+
+    return redirect(url_for('admin.get_countries'))
 
 @admin_bp.route('/api/countries/<int:country_id>', methods=['PUT'])
 def update_country(country_id):
