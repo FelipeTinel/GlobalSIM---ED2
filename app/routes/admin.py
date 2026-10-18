@@ -21,7 +21,7 @@ def create_country():
     # Recebe todas as informações de um país, inclusive coordenadas (depois vejo como trato melhor isso).
     code = request.form.get('code')
     country = request.form.get('country')
-    region = request.form.get('region')
+    continent = request.form.get('continent')
     provider = request.form.get('provider')
     tech = request.form.get('tech')
     # coordenadas = request.form.get('coordenadas') 
@@ -30,7 +30,7 @@ def create_country():
     new_country = {
         "code": code,
         "country": country,
-        "region": region,
+        "continent": continent,
         "provider": provider,
         "tech": tech
     }
