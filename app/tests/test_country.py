@@ -16,6 +16,7 @@ def sample_country() -> Country:
         "continent": "América do Sul",
         "provider": "Claro",
         "tech": "3g",
+        "coordinates": [-14.235, -51.9253],
     }
 
 
