@@ -1,4 +1,4 @@
-from app.models.country import CountriesManager
+from app.models.country import countries_manager
 from flask import Blueprint, render_template, request, redirect, url_for
 
 admin_bp = Blueprint('admin',__name__, url_prefix='/admin')
@@ -36,7 +36,7 @@ def create_country():
         "coordinates": coordinates
     }
 
-    CountriesManager.create(key=new_country.code, country=new_country)
+    countries_manager.create(key=code, country=new_country)
 
     return redirect(url_for('admin.get_countries'))
 

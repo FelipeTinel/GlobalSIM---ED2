@@ -60,3 +60,5 @@ class CountriesManager:
 
     def get_instrumentation(self) -> dict[str, Any]:
         return self.countries.get_instrumentation()
+
+countries_manager = CountriesManager()
