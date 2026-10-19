@@ -29,11 +29,11 @@ def get_country(country_id):
         return jsonify({"error": "Country not found"}), 404
 
     country_info = {
-        "code": country.code,
-        "country": country.country,
-        "continent": country.continent,
-        "provider": country.provider,
-        "tech": country.tech
+        "code": country.get("code"),
+        "country": country.get("country"),
+        "continent": country.get("continent"),
+        "provider": country.get("provider"),
+        "tech": country.get("tech")
     }
 
     return jsonify(country_info), 200
@@ -41,25 +41,23 @@ def get_country(country_id):
 @admin_bp.route('/api/countries', methods=['POST'])
 def create_country():
     # Recebe todas as informações de um país, inclusive coordenadas (depois vejo como trato melhor isso).
-    code = request.form.get('code')
-    country = request.form.get('country')
-    continent = request.form.get('continent')
-    provider = request.form.get('provider')
-    tech = request.form.get('tech')
-    coordinates = request.form.get('coordinates') 
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No country data provided"}), 400
 
+    code = data.get("code")
     new_country = {
         "code": code,
-        "country": country,
-        "continent": continent,
-        "provider": provider,
-        "tech": tech,
-        "coordinates": coordinates
+        "country": data.get("country") or data.get("name"),
+        "continent": data.get("continent"),
+        "provider": data.get("provider"),
+        "tech": data.get("tech"),
+        "coordinates": [data.get("lat"), data.get("lng")]
     }
 
     countries_manager.create(key=code, country=new_country)
 
-    return redirect(url_for('admin.get_countries'))
+    return jsonify({"message": f"Country {code} successfully created"}), 201
 
 @admin_bp.route('/api/countries/<string:country_id>', methods=['PUT'])
 def update_country(country_id):
