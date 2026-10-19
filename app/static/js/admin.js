@@ -87,7 +87,7 @@ export async function loadCountryList() {
         li.querySelector('.country-item').addEventListener('click', () => {
             editingCountryId = id;
             document.getElementById('country-id').value = id;
-            document.getElementById('country-id').disabled = geralmente;
+            document.getElementById('country-id').disabled = true;
             document.getElementById('country-name').value = dados.name || '';
             document.getElementById('country-lat').value = dados.lat || '';
             document.getElementById('country-lng').value = dados.lng || '';
@@ -116,6 +116,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const countryId = document.getElementById('country-id').value.trim();
         const countryData = {
+            code: countryId,
             name: document.getElementById('country-name').value.trim(),
             lat: parseFloat(document.getElementById('country-lat').value),
             lng: parseFloat(document.getElementById('country-lng').value),
