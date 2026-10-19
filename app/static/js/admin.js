@@ -111,10 +111,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     loadCountryList();
 
     const form = document.getElementById('country-form');
+    
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const countryId = document.getElementById('country-id').value.trim();
+        const countryIdInput = document.getElementById('country-id');
+        const countryId = countryIdInput.value.trim();
+        
         const countryData = {
             code: countryId,
             name: document.getElementById('country-name').value.trim(),
@@ -125,15 +128,38 @@ document.addEventListener("DOMContentLoaded", async () => {
             tech: document.getElementById('country-tech').value.trim()
         };
 
-        if (editingCountryId) {
-            await updateCountry(editingCountryId, countryData);
-        } else {
-            await createCountry(countryData);
+        const currentCountries = await getCountries();
+        let existingKey = null;
+
+        if (currentCountries && typeof currentCountries === 'object') {
+            const foundKey = Object.keys(currentCountries).find(
+                key => key.toLowerCase() === countryId.toLowerCase()
+            );
+            if (foundKey) {
+                existingKey = foundKey;
+            }
         }
 
-        form.reset();
-        document.getElementById('country-id').disabled = false;
-        editingCountryId = null;
-        loadCountryList();
+        let result;
+
+        if (editingCountryId || existingKey) {
+            const targetId = editingCountryId || existingKey;
+            result = await updateCountry(targetId, countryData);
+        } else {
+            result = await createCountry(countryData);
+        }
+
+        if (result !== null && result !== undefined) {
+            form.reset();
+            countryIdInput.disabled = false;
+            editingCountryId = null;
+            
+            const submitBtn = document.querySelector('#country-form button[type="submit"]');
+            if (submitBtn) submitBtn.textContent = "Salvar País";
+            
+            loadCountryList();
+        } else {
+            alert("Ocorreu um erro ao salvar os dados. Verifique o console.");
+        }
     });
 });
