@@ -10,7 +10,15 @@ def admin_page():
 @admin_bp.route('/api/countries', methods=['GET'])
 def get_countries():
     # Retorno dos nomes e IDs de todos os países.
-    pass
+    countries = countries_manager.get_all()
+    response = {
+        c["code"]: {
+            "name": c.get("country")
+        }
+        for c in countries
+    }
+    
+    return jsonify(response), 200
 
 @admin_bp.route('/api/countries/<int:country_id>', methods=['GET'])
 def get_country(country_id):
