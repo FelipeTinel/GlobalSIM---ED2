@@ -1,3 +1,4 @@
+from app.models.country import countries_manager
 from flask import Blueprint, render_template, request, jsonify
 
 """
@@ -21,12 +22,33 @@ def index():
 @home_bp.route('/api/countries', methods=['GET'])
 def list_countries():
     # Retorno de ID, nome do país e coordenadas de todos os países presentes no sistema.
-    pass
+    countries = countries_manager.get_all()
+    response = {
+        c["code"]: {
+            "name": c.get("country"),
+            "coordinates": c.get("coordinates")
+        }
+        for c in countries
+    }
 
-@home_bp.route('/api/countries/<int:country_id>', methods=['GET'])
+    return jsonify(response), 200
+
+@home_bp.route('/api/countries/<string:country_id>', methods=['GET'])
 def get_country(country_id):
     # Retorno de todas as informações do país ID selecionado, menos as coordenadas.
-    pass 
+    country = countries_manager.get(country_id)
+
+    if not country:
+        return jsonify({"error": "Country not found"}), 404
+
+    response = {
+        "name": country.get("country"),
+        "continent": country.get("continent"),
+        "provider": country.get("provider"),
+        "tech": country.get("tech"),
+    }
+
+    return jsonify(response), 200
 
 @home_bp.route('/api/users/<int:user_id>/country', methods=['POST'])
 def select_country(user_id):

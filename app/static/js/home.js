@@ -22,7 +22,7 @@ async function initMap () {
     }
 
     Object.entries(countries).forEach(([countryId, coord]) => {
-        const marker = L.marker(coord).addTo(map);
+        const marker = L.marker(coord.coordinates).addTo(map);
         
         marker.on('click', async () => {
 
