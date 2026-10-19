@@ -86,7 +86,6 @@ async function selectCountry(countryId) {
         if (!detailsCache[countryId]) {
             detailsCache[countryId] = await fetchCountryDetails(countryId);
         }
-        // Se o usuário clicou em outro país enquanto carregava, ignora
         if (selectedId === countryId) {
             renderDetails(countryId, detailsCache[countryId]);
         }
