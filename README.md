@@ -4,8 +4,6 @@ Aplicação Web desenvolvida em **Python/Flask** para gerenciamento de cobertura
 
 ---
 
-## Identificação
-
 - **Instituição:** Universidade do Estado da Bahia (UNEB) — DCET/I — Sistemas de Informação
 - **Disciplina:** Estruturas de Dados II
 - **Docente:** Prof. Maria Inés Restovic
