@@ -4,21 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GlobalSIM - Painel Administrativo</title>
-    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script defer type="module" src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    <script defer type="module" src="{{ url_for('static', filename='js/admin/main.js') }}"></script>
 </head>
 <body>
     <h1>Painel Administrativo - GlobalSIM</h1>
 
-    <div class="dashboard-container">
-        
-        <div class="sidebar-panel">
-            <h2 class="section-title">Cadastrar / Editar País</h2>
+    <main class="admin-layout">
+        <section class="card">
+            <h2 class="section-title" id="form-title">Cadastrar País</h2>
+            <p class="form-mode" id="form-mode" hidden>Editando: <b id="editing-label"></b></p>
+
             <form id="country-form">
                 <div class="form-group">
                     <label for="country-id" class="form-label">ID (ex: br, us):</label>
@@ -28,13 +27,15 @@
                     <label for="country-name" class="form-label">Nome do País:</label>
                     <input type="text" id="country-name" class="form-input" required>
                 </div>
-                <div class="form-group">
-                    <label for="country-lat" class="form-label">Latitude:</label>
-                    <input type="number" step="any" id="country-lat" class="form-input" required>
-                </div>
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="country-lng" class="form-label">Longitude:</label>
-                    <input type="number" step="any" id="country-lng" class="form-input" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="country-lat" class="form-label">Latitude:</label>
+                        <input type="number" step="any" id="country-lat" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="country-lng" class="form-label">Longitude:</label>
+                        <input type="number" step="any" id="country-lng" class="form-input" required>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="country-continent" class="form-label">Nome do Continente:</label>
@@ -48,18 +49,29 @@
                     <label for="country-tech" class="form-label">Tecnologia:</label>
                     <input type="text" id="country-tech" class="form-input" required>
                 </div>
-                <button type="submit" class="btn-primary">Salvar País</button>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary" id="submit-btn">Salvar País</button>
+                    <button type="button" class="btn-secondary" id="cancel-btn" hidden>Cancelar</button>
+                </div>
             </form>
+        </section>
+
+        <div class="right-col">
+            <section class="card">
+                <h2 class="section-title">Países no Sistema <span class="badge" id="countries-count">0</span></h2>
+                <ul id="countries-list"></ul>
+            </section>
+
+            <section class="card" id="details-card">
+                <p class="placeholder">Selecione um país na lista ou no mapa para ver os detalhes.</p>
+            </section>
         </div>
 
-        <div class="sidebar-panel">
-            <h2 class="section-title">Países no Sistema</h2>
-            <ul id="countries-list">
-            </ul>
-        </div>
-
-    </div>
-
-    <div id="map"></div>
+        <section class="card map-card">
+            <h2 class="section-title">Localização</h2>
+            <div id="admin-map"></div>
+        </section>
+    </main>
 </body>
 </html>

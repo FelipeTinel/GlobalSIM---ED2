@@ -16,6 +16,18 @@
 </head>
 <body>
     <h1>GlobalSIM</h1>
-    <div align=center id="map"></div>
+
+    <div class="dashboard-container">
+        <div id="map"></div>
+
+        <aside class="sidebar-panel">
+            <h2>Países</h2>
+            <input type="search" id="country-search" placeholder="Buscar país..." autocomplete="off">
+            <ul id="country-list"></ul>
+        </aside>
+    </div>
+
+    <section class="details-panel" id="details-panel">
+        <p class="placeholder">Selecione um país no mapa ou na lista para ver os detalhes.</p>
+    </section>
 </body>
-</html>

@@ -26,7 +26,7 @@ def list_countries():
     response = {
         c["code"]: {
             "name": c.get("country"),
-            "coordinates": c.get("coordinates")
+            "coordinates": c.get("coordinates"),
         }
         for c in countries
     }

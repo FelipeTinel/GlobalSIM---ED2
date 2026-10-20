@@ -13,7 +13,11 @@ def get_countries():
     countries = countries_manager.get_all()
     response = {
         c["code"]: {
-            "name": c.get("country")
+            "name": c.get("country"),
+            "coordinates": c.get("coordinates"),
+            "continent": c.get("continent"),
+            "provider": c.get("provider"),
+            "tech": c.get("tech"),
         }
         for c in countries
     }
