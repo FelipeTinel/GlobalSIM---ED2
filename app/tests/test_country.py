@@ -91,3 +91,24 @@ def test_json_persistence_reload(tmp_path, sample_country):
     # Nova instância deve carregar automaticamente do JSON para a Tabela Hash
     mgr2 = CountriesManager(filepath=json_path, capacity=11)
     assert mgr2.get("BR") == sample_country
+
+
+def test_collision_tracking_and_delete(manager, sample_country):
+    # PT e US colidem no bucket #1 quando capacity = 11
+    pt_country = {**sample_country, "code": "PT", "country": "Portugal"}
+    us_country = {**sample_country, "code": "US", "country": "Estados Unidos"}
+
+    manager.create("PT", pt_country)
+    manager.create("US", us_country)
+
+    inst = manager.get_instrumentation()
+    assert inst["collisions"] == 1
+
+    manager.get("US")
+    inst_after_search = manager.get_instrumentation()
+    assert inst_after_search["last_search_key"] == "US"
+    assert inst_after_search["last_search_bucket"] == 1
+    assert inst_after_search["last_search_comparisons"] == 2
+
+    manager.delete("US")
+    assert manager.get_instrumentation()["collisions"] == 0

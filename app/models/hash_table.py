@@ -9,6 +9,8 @@ class HashTable:
         self.size: int = 0
         self.collisions: int = 0
         self.last_search_comparisons: int = 0
+        self.last_search_key: str | None = None
+        self.last_search_bucket: int | None = None
 
     def _normalize_key(self, key: str) -> str:
         return key.strip().upper()
@@ -41,11 +43,16 @@ class HashTable:
     def get(self, key: str) -> Any | None:
         if not key or not key.strip():
             self.last_search_comparisons = 0
+            self.last_search_key = None
+            self.last_search_bucket = None
             return None
 
         norm_key = self._normalize_key(key)
         index = self._hash(norm_key)
         bucket = self.buckets[index]
+
+        self.last_search_key = norm_key
+        self.last_search_bucket = index
 
         comparisons = 0
         for existing_key, value in bucket:
@@ -82,6 +89,8 @@ class HashTable:
 
         for i, (existing_key, _) in enumerate(bucket):
             if self._normalize_key(existing_key) == norm_key:
+                if len(bucket) > 1 and self.collisions > 0:
+                    self.collisions -= 1
                 bucket.pop(i)
                 self.size -= 1
                 return
@@ -104,6 +113,8 @@ class HashTable:
             "collisions": self.collisions,
             "occupied_buckets": occupied_buckets,
             "last_search_comparisons": self.last_search_comparisons,
+            "last_search_key": self.last_search_key,
+            "last_search_bucket": self.last_search_bucket,
             "buckets": [
                 {
                     "index": idx,

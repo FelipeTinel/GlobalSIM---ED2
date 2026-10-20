@@ -7,6 +7,11 @@ admin_bp = Blueprint('admin',__name__, url_prefix='/admin')
 def admin_page():
     return render_template('admin.html')
 
+@admin_bp.route('/api/instrumentation', methods=['GET'])
+def get_instrumentation():
+    # Retorno das métricas e estado interno dos buckets da Tabela Hash.
+    return jsonify(countries_manager.get_instrumentation()), 200
+
 @admin_bp.route('/api/countries', methods=['GET'])
 def get_countries():
     # Retorno dos nomes e IDs de todos os países.
@@ -59,7 +64,12 @@ def create_country():
         "coordinates": [data.get("lat"), data.get("lng")]
     }
 
-    countries_manager.create(key=code, country=new_country)
+    try:
+        countries_manager.create(key=code, country=new_country)
+    except ValueError as err:
+        return jsonify({"error": str(err)}), 400
+    except KeyError as err:
+        return jsonify({"error": str(err)}), 409
 
     return jsonify({"message": f"Country {code} successfully created"}), 201
 
