@@ -30,9 +30,14 @@ def index():
                 "comparisons": inst["last_search_comparisons"],
                 "bucket": inst["last_search_bucket"],
             }
+    countries = sorted(
+        countries_manager.get_all(),
+        key=lambda c: (c.get("country") or "").lower()
+    )
     return render_template(
         'home.html',
         point=initial_point,
+        countries=countries,
         searched_code=searched_code,
         coverage_result=coverage_result,
     )
@@ -77,8 +82,4 @@ def get_country(country_id):
 
     return jsonify(response), 200
 
-@home_bp.route('/api/users/<int:user_id>/country', methods=['POST'])
-def select_country(user_id):
-    # Acho que isso aqui não precisa por enquanto, deixa baixo.
-    pass
 

@@ -40,8 +40,18 @@
                     value="{{ searched_code or '' }}"
                     autocomplete="off"
                 >
+                <button type="submit" class="btn-coverage">Verificar cobertura</button>
             </form>
-            <ul id="country-list"></ul>
+            <ul id="country-list">
+                {% if countries %}
+                    {% for c in countries %}
+                        <li data-id="{{ c.code }}">
+                            <span>{{ c.country }}</span>
+                            <span class="list-code">{{ c.code | upper }}</span>
+                        </li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
         </aside>
     </div>
 

@@ -4,6 +4,12 @@ import { getCoords } from '../shared/coords.js';
 // editingId = null → modo "cadastrar"; string → modo "editar"
 function setFormMode(editingId) {
     const editing = editingId !== null;
+    const form = $('country-form');
+    if (form) {
+        form.action = editing
+            ? `/admin/api/countries/${encodeURIComponent(editingId)}/update`
+            : '/admin/api/countries';
+    }
 
     $('form-title').textContent = editing ? 'Editar País' : 'Cadastrar País';
     $('form-mode').hidden = !editing;
