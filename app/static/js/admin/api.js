@@ -18,6 +18,24 @@ export async function getCountries() {
     }
 }
 
+export async function getCountry(countryId) {
+    const response = await fetch(`${BASE}/${encodeURIComponent(countryId)}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+    });
+    const data = await response.json().catch(() => ({}));
+    return { ok: response.ok, status: response.status, data };
+}
+
+export async function getInstrumentation() {
+    try {
+        return await request('/admin/api/instrumentation', 'GET');
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+
 export async function createCountry(countryData) {
     try {
         return await request(BASE, 'POST', countryData);

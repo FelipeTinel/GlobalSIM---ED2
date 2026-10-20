@@ -17,7 +17,8 @@
     min-width: 0;
 }
 
-.map-card { grid-column: 1 / -1; }
+.map-card,
+.instrumentation-card { grid-column: 1 / -1; }
 
 @media (max-width: 800px) {
     .admin-layout { grid-template-columns: 1fr; width: 100%; }
@@ -213,4 +214,184 @@
     height: 400px;
     border-radius: 8px;
     border: 1px solid #e2e8f0;
+}
+
+/* ---------- Instrumentação da Tabela Hash ---------- */
+.inst-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.inst-header .section-title {
+    margin: 0;
+}
+
+.inst-search-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.inst-search-input {
+    width: 145px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.inst-search-btn {
+    flex: 0 0 auto;
+    padding: 8px 14px;
+    white-space: nowrap;
+}
+
+.inst-metrics-grid {
+    margin-bottom: 20px;
+}
+
+.metric-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+}
+
+.metric-box .info-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.metric-sub {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.subsection-title {
+    color: #0f172a;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 20px 0 12px 0;
+}
+
+.buckets-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bucket-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.bucket-row.has-collision {
+    border-color: #fde68a;
+    background: #fffbeb;
+}
+
+.bucket-row.searched-bucket {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+.bucket-index {
+    flex-shrink: 0;
+    width: 36px;
+    text-align: center;
+    padding: 4px 6px;
+    border-radius: 6px;
+    background: #e2e8f0;
+    color: #0f172a;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.bucket-row.searched-bucket .bucket-index {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.bucket-chain {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 0;
+}
+
+.bucket-empty {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+.bucket-node {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #0f172a;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s, background-color 0.15s;
+}
+
+.bucket-node:hover {
+    border-color: #2563eb;
+    background: #dbeafe;
+}
+
+.bucket-node-code {
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.bucket-arrow {
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.bucket-status {
+    flex-shrink: 0;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.bucket-status.status-empty {
+    background: #e2e8f0;
+    color: #64748b;
+}
+
+.bucket-status.status-ok {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.bucket-status.status-collision {
+    background: #fef3c7;
+    color: #b45309;
 }

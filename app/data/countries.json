@@ -1,13 +1,13 @@
 [
     {
-        "code": "ES",
-        "country": "Espanha",
-        "continent": "Europa",
-        "provider": "Operadora ES",
+        "code": "BR",
+        "country": "Brasil",
+        "continent": "América do Sul",
+        "provider": "Operadora BR",
         "tech": "5G",
         "coordinates": [
-            40.4637,
-            -3.7492
+            -14.235,
+            -51.9253
         ]
     },
     {
@@ -22,36 +22,14 @@
         ]
     },
     {
-        "code": "US",
-        "country": "Estados Unidos",
-        "continent": "América do Norte",
-        "provider": "Operadora US",
-        "tech": "5G",
-        "coordinates": [
-            37.0902,
-            -95.7129
-        ]
-    },
-    {
-        "code": "IT",
-        "country": "Itália",
+        "code": "ES",
+        "country": "Espanha",
         "continent": "Europa",
-        "provider": "Operadora IT",
+        "provider": "Operadora ES",
         "tech": "5G",
         "coordinates": [
-            41.8719,
-            12.5674
-        ]
-    },
-    {
-        "code": "BR",
-        "country": "Brasil",
-        "continent": "Amriaca",
-        "provider": "Claaaaaro",
-        "tech": "67g",
-        "coordinates": [
-            11,
-            11
+            40.4637,
+            -3.7492
         ]
     },
     {
@@ -66,14 +44,47 @@
         ]
     },
     {
-        "code": "CN",
-        "country": "China",
-        "continent": "Asia",
-        "provider": "Claro",
-        "tech": "Xing",
+        "code": "IT",
+        "country": "Itália",
+        "continent": "Europa",
+        "provider": "Operadora IT",
+        "tech": "5G",
         "coordinates": [
-            11,
-            11
+            41.8719,
+            12.5674
+        ]
+    },
+    {
+        "code": "US",
+        "country": "Estados Unidos",
+        "continent": "América do Norte",
+        "provider": "Operadora US",
+        "tech": "5G",
+        "coordinates": [
+            37.0902,
+            -95.7129
+        ]
+    },
+    {
+        "code": "CA",
+        "country": "Canadá",
+        "continent": "América do Norte",
+        "provider": "Operadora CA",
+        "tech": "5G",
+        "coordinates": [
+            56.1304,
+            -106.3468
+        ]
+    },
+    {
+        "code": "JP",
+        "country": "Japão",
+        "continent": "Ásia",
+        "provider": "Operadora JP",
+        "tech": "5G",
+        "coordinates": [
+            36.2048,
+            138.2529
         ]
     }
 ]

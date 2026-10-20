@@ -26,6 +26,9 @@ class CountriesManager:
             code = item.get("code", "").strip()
             if code and code not in self.countries:
                 self.countries.insert(code, item)
+        self.countries.last_search_comparisons = 0
+        self.countries.last_search_key = None
+        self.countries.last_search_bucket = None
 
     def _persist(self) -> None:
         if self.repo:

@@ -5,13 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GlobalSIM - Painel Administrativo</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script defer type="module" src="{{ url_for('static', filename='js/admin/main.js') }}"></script>
 </head>
 <body>
-    <h1>Painel Administrativo - GlobalSIM</h1>
+    <header class="top-bar">
+        <h1>Painel Administrativo - GlobalSIM</h1>
+        <a href="{{ url_for('home.index') }}" class="nav-link"><i class="bi bi-arrow-down-left-square-fill"></i> Consulta de Cobertura</a>
+    </header>
 
     <main class="admin-layout">
         <section class="card">
@@ -68,8 +72,36 @@
             </section>
         </div>
 
+        <section class="card instrumentation-card" id="instrumentation-card">
+            <div class="inst-header">
+                <h2 class="section-title">
+                    Instrumentação da Tabela Hash
+                    <span class="badge" id="inst-capacity-badge">M = 11</span>
+                </h2>
+                <form id="inst-search-form" class="inst-search-form">
+                    <input
+                        type="text"
+                        id="inst-search-input"
+                        class="form-input inst-search-input"
+                        placeholder="Chave (ex: US)"
+                        maxlength="10"
+                        autocomplete="off"
+                        required
+                    >
+                    <button type="submit" class="btn-primary inst-search-btn">Simular Busca</button>
+                </form>
+            </div>
+
+            <div class="info-grid inst-metrics-grid" id="inst-metrics"></div>
+
+            <p class="form-mode" id="inst-search-feedback" hidden></p>
+
+            <h3 class="subsection-title">Distribuição dos Buckets</h3>
+            <div class="buckets-list" id="buckets-list"></div>
+        </section>
+
         <section class="card map-card">
-            <h2 class="section-title">Localização</h2>
+            <h2 class="section-title"><i class="bi bi-geo-alt-fill"></i> Localização</h2>
             <div id="admin-map"></div>
         </section>
     </main>

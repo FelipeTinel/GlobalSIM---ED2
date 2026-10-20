@@ -3,7 +3,7 @@ import os
 
 class CountryRepository:
 
-    def __init__(self, filepath: str = "app/data/paises.json"):
+    def __init__(self, filepath: str = "app/data/countries.json"):
         self.filepath = filepath
         dirname = os.path.dirname(self.filepath)
         if dirname:
