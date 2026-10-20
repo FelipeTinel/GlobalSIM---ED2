@@ -1,16 +1,45 @@
 from app.models.country import countries_manager
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 
-admin_bp = Blueprint('admin',__name__, url_prefix='/admin')
+admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
-@admin_bp.route('/')
+
+def _extract_payload() -> dict:
+    if request.is_json:
+        return request.get_json(silent=True) or {}
+    return request.form.to_dict()
+
+
+def _parse_coord(value):
+    try:
+        return float(value) if value not in (None, "") else None
+    except (TypeError, ValueError):
+        return None
+
+
+@admin_bp.route('/', methods=['GET'])
 def admin_page():
-    return render_template('admin.html')
+    searched_key = request.args.get('search', '').strip().upper()
+    if searched_key:
+        countries_manager.get(searched_key)
+
+    countries = sorted(
+        countries_manager.get_all(),
+        key=lambda c: (c.get("country") or "").lower()
+    )
+    instrumentation = countries_manager.get_instrumentation()
+    return render_template(
+        'admin.html',
+        countries=countries,
+        instrumentation=instrumentation,
+    )
+
 
 @admin_bp.route('/api/instrumentation', methods=['GET'])
 def get_instrumentation():
     # Retorno das métricas e estado interno dos buckets da Tabela Hash.
     return jsonify(countries_manager.get_instrumentation()), 200
+
 
 @admin_bp.route('/api/countries', methods=['GET'])
 def get_countries():
@@ -26,8 +55,9 @@ def get_countries():
         }
         for c in countries
     }
-    
+
     return jsonify(response), 200
+
 
 @admin_bp.route('/api/countries/<string:country_id>', methods=['GET'])
 def get_country(country_id):
@@ -47,21 +77,22 @@ def get_country(country_id):
 
     return jsonify(country_info), 200
 
+
 @admin_bp.route('/api/countries', methods=['POST'])
 def create_country():
-    # Recebe todas as informações de um país, inclusive coordenadas (depois vejo como trato melhor isso).
-    data = request.get_json()
+    # Cadastro de país utilizando POST e padrão Post/Redirect/Get.
+    data = _extract_payload()
     if not data:
         return jsonify({"error": "No country data provided"}), 400
 
-    code = data.get("code")
+    code = (data.get("code") or data.get("id") or "").strip().upper()
     new_country = {
         "code": code,
         "country": data.get("country") or data.get("name"),
         "continent": data.get("continent"),
         "provider": data.get("provider"),
         "tech": data.get("tech"),
-        "coordinates": [data.get("lat"), data.get("lng")]
+        "coordinates": [_parse_coord(data.get("lat")), _parse_coord(data.get("lng"))]
     }
 
     try:
@@ -71,38 +102,49 @@ def create_country():
     except KeyError as err:
         return jsonify({"error": str(err)}), 409
 
-    return jsonify({"message": f"Country {code} successfully created"}), 201
+    if not request.is_json:
+        return redirect(url_for('admin.admin_page'))
+    return redirect(url_for('admin.get_countries'))
 
-@admin_bp.route('/api/countries/<string:country_id>', methods=['PUT'])
+
+@admin_bp.route('/api/countries/<string:country_id>/update', methods=['POST'])
 def update_country(country_id):
-    # Recebe, novamente, todos os dados de um país, mas dessa vez você só atualiza o do ID informado.
-    data = request.get_json()
+    # Alteração dos dados de um país utilizando exclusivamente POST e Post/Redirect/Get.
+    data = _extract_payload()
     if not data:
         return jsonify({"error": "No country data provided"}), 400
 
     updated_country = {
-        "code": country_id,
+        "code": country_id.strip().upper(),
         "country": data.get("country") or data.get("name"),
         "continent": data.get("continent"),
         "provider": data.get("provider"),
         "tech": data.get("tech"),
-        "coordinates": [data.get("lat"), data.get("lng")]
+        "coordinates": [_parse_coord(data.get("lat")), _parse_coord(data.get("lng"))]
     }
 
-    try: 
+    try:
         countries_manager.update(key=country_id, country=updated_country)
-        return jsonify({"message": f"Country {country_id} succesfully updated"}), 200
+    except ValueError as err:
+        return jsonify({"error": str(err)}), 400
     except KeyError:
         return jsonify({"error": "Country not found"}), 404
 
+    if not request.is_json:
+        return redirect(url_for('admin.admin_page'))
+    return redirect(url_for('admin.get_countries'))
 
 
-@admin_bp.route('/api/countries/<string:country_id>', methods=['DELETE'])
+@admin_bp.route('/api/countries/<string:country_id>/delete', methods=['POST'])
 def delete_country(country_id):
-    # Recebe um ID e você vrau.
+    # Remoção de país utilizando exclusivamente POST e Post/Redirect/Get.
     try:
         countries_manager.delete(country_id)
-        return jsonify({"message": f"Country: {country_id} successfully deleted"}), 200
     except KeyError:
         return jsonify({"error": "Country not found"}), 404
+
+    if not request.is_json:
+        return redirect(url_for('admin.admin_page'))
+    return redirect(url_for('admin.get_countries'))
+
 

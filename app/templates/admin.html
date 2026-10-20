@@ -22,36 +22,36 @@
             <h2 class="section-title" id="form-title">Cadastrar País</h2>
             <p class="form-mode" id="form-mode" hidden>Editando: <b id="editing-label"></b></p>
 
-            <form id="country-form">
+            <form id="country-form" method="post" action="{{ url_for('admin.create_country') }}">
                 <div class="form-group">
                     <label for="country-id" class="form-label">ID (ex: br, us):</label>
-                    <input type="text" id="country-id" class="form-input" required>
+                    <input type="text" id="country-id" name="code" class="form-input" required>
                 </div>
                 <div class="form-group">
                     <label for="country-name" class="form-label">Nome do País:</label>
-                    <input type="text" id="country-name" class="form-input" required>
+                    <input type="text" id="country-name" name="country" class="form-input" required>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="country-lat" class="form-label">Latitude:</label>
-                        <input type="number" step="any" id="country-lat" class="form-input" required>
+                        <input type="number" step="any" id="country-lat" name="lat" class="form-input" required>
                     </div>
                     <div class="form-group">
                         <label for="country-lng" class="form-label">Longitude:</label>
-                        <input type="number" step="any" id="country-lng" class="form-input" required>
+                        <input type="number" step="any" id="country-lng" name="lng" class="form-input" required>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="country-continent" class="form-label">Nome do Continente:</label>
-                    <input type="text" id="country-continent" class="form-input" required>
+                    <input type="text" id="country-continent" name="continent" class="form-input" required>
                 </div>
                 <div class="form-group">
                     <label for="country-provider" class="form-label">Nome da Operadora:</label>
-                    <input type="text" id="country-provider" class="form-input" required>
+                    <input type="text" id="country-provider" name="provider" class="form-input" required>
                 </div>
                 <div class="form-group">
                     <label for="country-tech" class="form-label">Tecnologia:</label>
-                    <input type="text" id="country-tech" class="form-input" required>
+                    <input type="text" id="country-tech" name="tech" class="form-input" required>
                 </div>
 
                 <div class="form-actions">
@@ -63,8 +63,20 @@
 
         <div class="right-col">
             <section class="card">
-                <h2 class="section-title">Países no Sistema <span class="badge" id="countries-count">0</span></h2>
-                <ul id="countries-list"></ul>
+                <h2 class="section-title">Países no Sistema <span class="badge" id="countries-count">{{ countries|length if countries is defined else 0 }}</span></h2>
+                <ul id="countries-list">
+                    {% if countries %}
+                        {% for c in countries %}
+                            <li class="country-item" data-id="{{ c.code }}">
+                                <span class="country-code">{{ c.code | upper }}</span>
+                                <div class="country-main">
+                                    <span class="country-name">{{ c.country }}</span>
+                                    <span class="country-meta">{{ c.continent }} · {{ c.provider }}</span>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
             </section>
 
             <section class="card" id="details-card">
@@ -76,12 +88,13 @@
             <div class="inst-header">
                 <h2 class="section-title">
                     Instrumentação da Tabela Hash
-                    <span class="badge" id="inst-capacity-badge">M = 11</span>
+                    <span class="badge" id="inst-capacity-badge">M = {{ instrumentation.capacity if instrumentation is defined else 11 }}</span>
                 </h2>
-                <form id="inst-search-form" class="inst-search-form">
+                <form id="inst-search-form" class="inst-search-form" method="get" action="{{ url_for('admin.admin_page') }}">
                     <input
                         type="text"
                         id="inst-search-input"
+                        name="search"
                         class="form-input inst-search-input"
                         placeholder="Chave (ex: US)"
                         maxlength="10"
@@ -92,12 +105,81 @@
                 </form>
             </div>
 
-            <div class="info-grid inst-metrics-grid" id="inst-metrics"></div>
+            <div class="info-grid inst-metrics-grid" id="inst-metrics">
+                {% if instrumentation is defined %}
+                    <div class="metric-box">
+                        <span class="info-label">Elementos (N)</span>
+                        <span class="info-value">{{ instrumentation.size }}</span>
+                        <span class="metric-sub">Países na estrutura</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="info-label">Capacidade (M)</span>
+                        <span class="info-value">{{ instrumentation.capacity }}</span>
+                        <span class="metric-sub">Total de buckets</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="info-label">Fator de Carga (α)</span>
+                        <span class="info-value">{{ instrumentation.load_factor }}</span>
+                        <span class="metric-sub">Razão N / M</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="info-label">Buckets Ocupados</span>
+                        <span class="info-value">{{ instrumentation.occupied_buckets }} / {{ instrumentation.capacity }}</span>
+                        <span class="metric-sub">{{ instrumentation.capacity - instrumentation.occupied_buckets }} livre(s)</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="info-label">Colisões</span>
+                        <span class="info-value">{{ instrumentation.collisions }}</span>
+                        <span class="metric-sub">Chaves em mesmo índice</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="info-label">Última Busca</span>
+                        <span class="info-value">{{ instrumentation.last_search_comparisons }} comp.</span>
+                        <span class="metric-sub">
+                            {% if instrumentation.last_search_key %}
+                                Chave "{{ instrumentation.last_search_key }}" (Bucket #{{ instrumentation.last_search_bucket }})
+                            {% else %}
+                                Nenhuma busca realizada
+                            {% endif %}
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
 
             <p class="form-mode" id="inst-search-feedback" hidden></p>
 
             <h3 class="subsection-title">Distribuição dos Buckets</h3>
-            <div class="buckets-list" id="buckets-list"></div>
+            <div class="buckets-list" id="buckets-list">
+                {% if instrumentation is defined %}
+                    {% for bucket in instrumentation.buckets %}
+                        <div class="bucket-row{% if bucket.has_collision %} has-collision{% endif %}{% if instrumentation.last_search_bucket == bucket.index %} searched-bucket{% endif %}">
+                            <span class="bucket-index">#{{ bucket.index }}</span>
+                            <div class="bucket-chain">
+                                {% if not bucket['items'] %}
+                                    <span class="bucket-empty">Vazio</span>
+                                {% else %}
+                                    {% for item in bucket['items'] %}
+                                        {% if not loop.first %}
+                                            <span class="bucket-arrow">→</span>
+                                        {% endif %}
+                                        <button type="button" class="bucket-node">
+                                            <span class="bucket-node-code">{{ (item.code or '') | upper }}</span>
+                                            <span>{{ item.country }}</span>
+                                        </button>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            {% if bucket.count == 0 %}
+                                <span class="bucket-status status-empty">Livre</span>
+                            {% elif bucket.count == 1 %}
+                                <span class="bucket-status status-ok">1 item</span>
+                            {% else %}
+                                <span class="bucket-status status-collision">Colisão ({{ bucket.count }} itens)</span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
         </section>
 
         <section class="card map-card">

@@ -46,7 +46,7 @@ export async function createCountry(countryData) {
 
 export async function updateCountry(countryId, countryData) {
     try {
-        return await request(`${BASE}/${countryId}`, 'PUT', countryData);
+        return await request(`${BASE}/${encodeURIComponent(countryId)}/update`, 'POST', countryData);
     } catch (error) {
         console.error(error);
     }
@@ -54,7 +54,7 @@ export async function updateCountry(countryId, countryData) {
 
 export async function deleteCountry(countryId) {
     try {
-        return await request(`${BASE}/${countryId}`, 'DELETE');
+        return await request(`${BASE}/${encodeURIComponent(countryId)}/delete`, 'POST');
     } catch (error) {
         console.error(error);
     }
