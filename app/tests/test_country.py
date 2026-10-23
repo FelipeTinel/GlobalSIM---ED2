@@ -93,8 +93,7 @@ def test_json_persistence_reload(tmp_path, sample_country):
     assert mgr2.get("BR") == sample_country
 
 
-def test_collision_tracking_and_delete(manager, sample_country):
-    # PT e US colidem no bucket #1 quando capacity = 11
+def test_multiple_insert_search_and_delete(manager, sample_country):
     pt_country = {**sample_country, "code": "PT", "country": "Portugal"}
     us_country = {**sample_country, "code": "US", "country": "Estados Unidos"}
 
@@ -102,16 +101,16 @@ def test_collision_tracking_and_delete(manager, sample_country):
     manager.create("US", us_country)
 
     inst = manager.get_instrumentation()
-    assert inst["collisions"] == 1
+    assert inst["size"] == 2
 
     manager.get("US")
     inst_after_search = manager.get_instrumentation()
     assert inst_after_search["last_search_key"] == "US"
-    assert inst_after_search["last_search_bucket"] == 1
-    assert inst_after_search["last_search_comparisons"] == 2
+    assert inst_after_search["last_search_comparisons"] == 1
 
     manager.delete("US")
-    assert manager.get_instrumentation()["collisions"] == 0
+    assert manager.get("US") is None
+    assert manager.get_instrumentation()["size"] == 1
 
 
 def test_admin_post_redirect_get_routes(tmp_path, monkeypatch, sample_country):

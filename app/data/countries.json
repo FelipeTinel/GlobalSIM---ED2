@@ -1,13 +1,13 @@
 [
     {
-        "code": "BR",
-        "country": "Brasil",
-        "continent": "América do Sul",
-        "provider": "Operadora BR",
+        "code": "ES",
+        "country": "Espanha",
+        "continent": "Europa",
+        "provider": "Operadora ES",
         "tech": "5G",
         "coordinates": [
-            -14.235,
-            -51.9253
+            40.4637,
+            -3.7492
         ]
     },
     {
@@ -22,25 +22,25 @@
         ]
     },
     {
-        "code": "ES",
-        "country": "Espanha",
-        "continent": "Europa",
-        "provider": "Operadora ES",
+        "code": "US",
+        "country": "Estados Unidos",
+        "continent": "América do Norte",
+        "provider": "Operadora US",
         "tech": "5G",
         "coordinates": [
-            40.4637,
-            -3.7492
+            37.0902,
+            -95.7129
         ]
     },
     {
-        "code": "FR",
-        "country": "França",
+        "code": "CR",
+        "country": "croacia",
         "continent": "Europa",
-        "provider": "Operadora FR",
-        "tech": "5G",
+        "provider": "Oi",
+        "tech": "5g",
         "coordinates": [
-            46.2276,
-            2.2137
+            33.0,
+            33.0
         ]
     },
     {
@@ -55,14 +55,14 @@
         ]
     },
     {
-        "code": "US",
-        "country": "Estados Unidos",
-        "continent": "América do Norte",
-        "provider": "Operadora US",
+        "code": "BR",
+        "country": "Brazel",
+        "continent": "América do Sul",
+        "provider": "Operadora BR",
         "tech": "5G",
         "coordinates": [
-            37.0902,
-            -95.7129
+            -14.235,
+            -51.9253
         ]
     },
     {
@@ -85,6 +85,17 @@
         "coordinates": [
             36.2048,
             138.2529
+        ]
+    },
+    {
+        "code": "KR",
+        "country": "Coréia do Sul",
+        "continent": "Asia",
+        "provider": "Operadora KR",
+        "tech": "5G",
+        "coordinates": [
+            37.5657,
+            126.978
         ]
     }
 ]
