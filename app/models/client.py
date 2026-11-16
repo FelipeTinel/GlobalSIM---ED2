@@ -64,5 +64,3 @@ class ClientManager:
 
     def get_instrumentation(self) -> dict[str, Any]:
         return self.btree.get_instrumentation()
-
-clients_manager = ClientManager()
