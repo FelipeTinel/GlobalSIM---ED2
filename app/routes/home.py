@@ -1,7 +1,8 @@
-from app.models.country import countries_manager
+from app.models.country import CountriesManager
 from flask import Blueprint, render_template, request, jsonify
 
 home_bp = Blueprint('home', __name__)
+countries_manager = CountriesManager()
 
 initial_point = {"lat": -12.9714, "lng": -38.5014, "zoom": 13}
 
