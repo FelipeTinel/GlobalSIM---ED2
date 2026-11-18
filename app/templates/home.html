@@ -14,7 +14,7 @@
         window.initialPoint = {{ point | tojson }};
         window.initialSearchedCode = {{ (searched_code or '') | tojson }};
     </script>
-    <script defer type="module" src="{{ url_for('static', filename='js/home.js') }}"></script>
+    <script defer type="module" src="{{ url_for('static', filename='js/home/main.js') }}"></script>
 </head>
 <body>
     <header class="hero-header">

@@ -2,13 +2,14 @@ from typing import TypedDict, Any
 from app.models.btree import BTree
 from app.repository.client import ClientRepository
 
-class Client(TypedDict):
+class Client(TypedDict, total=False):
     id: int
     name: str
     email: str
     esim: str
     pkg: int
     status: str
+    is_logged: bool
 
 class ClientManager:
 
