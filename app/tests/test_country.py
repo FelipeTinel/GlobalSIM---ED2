@@ -170,5 +170,6 @@ def test_admin_post_redirect_get_routes(tmp_path, monkeypatch, sample_country):
     resp_admin = client.get("/admin/?search=IT")
     assert resp_admin.status_code == 200
     assert "Instrumentação da Tabela Hash" in resp_admin.get_data(as_text=True)
+    assert "Instrumentação da Árvore B" in resp_admin.get_data(as_text=True)
 
 

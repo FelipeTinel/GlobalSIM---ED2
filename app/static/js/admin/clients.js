@@ -3,7 +3,15 @@
  * Visualização, Edição e Exclusão (Árvore B / JSONL)
  */
 
-import { getAllClients, getClient, createClient, updateClient, deleteClient } from '../session/api.js';
+import {
+    getAllClients,
+    getClient,
+    createClient,
+    updateClient,
+    deleteClient,
+    getClientInstrumentation,
+    getClientsByCountry
+} from '../session/api.js';
 
 let clients = [];
 let selectedClientId = null;
@@ -28,12 +36,199 @@ const elements = {
     inputEsim: document.getElementById('admin-client-esim'),
     inputPkg: document.getElementById('admin-client-pkg'),
     inputStatus: document.getElementById('admin-client-status'),
-    inputLogged: document.getElementById('admin-client-logged')
+    inputLogged: document.getElementById('admin-client-logged'),
+
+    // Instrumentação da Árvore B Principal
+    btreeOrderBadge: document.getElementById('btree-order-badge'),
+    btreeSearchForm: document.getElementById('btree-search-form'),
+    btreeSearchInput: document.getElementById('btree-search-input'),
+    btreeSearchFeedback: document.getElementById('btree-search-feedback'),
+    btreeMetricKeys: document.getElementById('btree-metric-keys'),
+    btreeMetricOrder: document.getElementById('btree-metric-order'),
+    btreeMetricHeight: document.getElementById('btree-metric-height'),
+    btreeMetricSplits: document.getElementById('btree-metric-splits'),
+    btreeMetricLastSearch: document.getElementById('btree-metric-last-search'),
+    btreeMetricLastKey: document.getElementById('btree-metric-last-key'),
+
+    // Instrumentação da Árvore B Secundária (Diferencial)
+    btreeSecMetricKeys: document.getElementById('btree-sec-metric-keys'),
+    btreeSecMetricHeight: document.getElementById('btree-sec-metric-height'),
+    btreeSecMetricSplits: document.getElementById('btree-sec-metric-splits'),
+    btreeSecMetricLastSearch: document.getElementById('btree-sec-metric-last-search'),
+    btreeSecMetricLastKey: document.getElementById('btree-sec-metric-last-key'),
+    btreeCountrySelect: document.getElementById('btree-country-select'),
+    btnQueryCountryClients: document.getElementById('btn-query-country-clients'),
+    btreeCountryResultBox: document.getElementById('btree-country-result-box'),
+    btreeCountryResultBadge: document.getElementById('btree-country-result-badge'),
+    btreeCountryResultTitle: document.getElementById('btree-country-result-title'),
+    btreeCountryResultMetrics: document.getElementById('btree-country-result-metrics'),
+    btreeCountryChipsList: document.getElementById('btree-country-chips-list')
 };
 
 export async function initAdminClients() {
     bindEvents();
     await loadClients();
+    await refreshBTreeInstrumentation();
+}
+
+export async function refreshBTreeInstrumentation() {
+    const { ok, data } = await getClientInstrumentation();
+    if (!ok || !data) return;
+
+    // Atualiza Árvore B Principal
+    if (elements.btreeOrderBadge && data.order) {
+        elements.btreeOrderBadge.textContent = `Ordem M = ${data.order}`;
+    }
+    if (elements.btreeMetricKeys) elements.btreeMetricKeys.textContent = data.total_keys ?? 0;
+    if (elements.btreeMetricOrder) elements.btreeMetricOrder.textContent = data.order ?? 5;
+    if (elements.btreeMetricHeight) elements.btreeMetricHeight.textContent = data.height ?? 0;
+    if (elements.btreeMetricSplits) elements.btreeMetricSplits.textContent = data.splits_count ?? 0;
+
+    if (elements.btreeMetricLastSearch) {
+        if (data.last_search_key !== null && data.last_search_key !== undefined) {
+            elements.btreeMetricLastSearch.textContent = `${data.last_search_comparisons ?? 0} comp. (${data.last_search_nodes_visited ?? 0} nós)`;
+        } else {
+            elements.btreeMetricLastSearch.textContent = '0 comp.';
+        }
+    }
+    if (elements.btreeMetricLastKey) {
+        if (data.last_search_key !== null && data.last_search_key !== undefined) {
+            elements.btreeMetricLastKey.textContent = `Chave #${data.last_search_key}`;
+        } else {
+            elements.btreeMetricLastKey.textContent = 'Nenhuma busca recente';
+        }
+    }
+
+    // Atualiza Árvore B Secundária (Diferencial)
+    const sec = data.secondary || {};
+    if (elements.btreeSecMetricKeys) elements.btreeSecMetricKeys.textContent = sec.total_keys ?? 0;
+    if (elements.btreeSecMetricHeight) elements.btreeSecMetricHeight.textContent = sec.height ?? 0;
+    if (elements.btreeSecMetricSplits) elements.btreeSecMetricSplits.textContent = sec.splits_count ?? 0;
+
+    if (elements.btreeSecMetricLastSearch) {
+        if (sec.last_search_key) {
+            elements.btreeSecMetricLastSearch.textContent = `${sec.last_search_comparisons ?? 0} comp. (${sec.last_search_nodes_visited ?? 0} nós)`;
+        } else {
+            elements.btreeSecMetricLastSearch.textContent = '0 comp.';
+        }
+    }
+    if (elements.btreeSecMetricLastKey) {
+        if (sec.last_search_key) {
+            elements.btreeSecMetricLastKey.textContent = `País "${sec.last_search_key}"`;
+        } else {
+            elements.btreeSecMetricLastKey.textContent = 'Nenhuma consulta por país';
+        }
+    }
+
+    return data;
+}
+
+async function handleBTreeSearch(rawId) {
+    if (!rawId) return;
+    const clientId = parseInt(rawId, 10);
+    if (isNaN(clientId)) return;
+
+    if (elements.btreeSearchFeedback) {
+        elements.btreeSearchFeedback.textContent = `Pesquisando cliente #${clientId} na Árvore B...`;
+        elements.btreeSearchFeedback.hidden = false;
+    }
+
+    const { ok, data: client } = await getClient(clientId);
+    const inst = await refreshBTreeInstrumentation();
+
+    const nodes = inst?.last_search_nodes_visited ?? 1;
+    const comps = inst?.last_search_comparisons ?? 1;
+
+    if (ok && client && client.id) {
+        if (elements.btreeSearchFeedback) {
+            elements.btreeSearchFeedback.innerHTML = `
+                <i class="bi bi-check-circle-fill" style="color: #16a34a;"></i>
+                <strong>Cliente #${client.id} (${client.name || 'Sem nome'})</strong> encontrado na Árvore B!
+                — Visitou <strong>${nodes} nó(s)</strong> e realizou <strong>${comps} comparação(ões)</strong> na árvore.
+            `;
+            elements.btreeSearchFeedback.hidden = false;
+        }
+        await selectClient(client.id);
+        const item = document.querySelector(`#admin-clients-list li[data-id="${client.id}"]`);
+        if (item) item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+        if (elements.btreeSearchFeedback) {
+            elements.btreeSearchFeedback.innerHTML = `
+                <i class="bi bi-exclamation-triangle-fill" style="color: #dc2626;"></i>
+                Cliente com ID <strong>#${clientId}</strong> não foi encontrado na Árvore B
+                — Inspecionou <strong>${nodes} nó(s)</strong> e <strong>${comps} comparação(ões)</strong> até folha nula.
+            `;
+            elements.btreeSearchFeedback.hidden = false;
+        }
+    }
+}
+
+async function handleQueryCountryClients() {
+    const code = elements.btreeCountrySelect?.value?.trim().toUpperCase();
+    if (!code) {
+        alert('Por favor, selecione um país para consultar no índice secundário.');
+        return;
+    }
+
+    if (elements.btreeCountryResultBox) {
+        elements.btreeCountryResultBox.hidden = false;
+    }
+    if (elements.btreeCountryChipsList) {
+        elements.btreeCountryChipsList.innerHTML = '<span class="placeholder">Consultando índice secundário na Árvore B...</span>';
+    }
+
+    try {
+        const res = await getClientsByCountry(code);
+        await refreshBTreeInstrumentation();
+
+        if (res.ok && res.data) {
+            const total = res.data.total_clients ?? (res.data.clients ? res.data.clients.length : 0);
+            const rawClients = res.data.clients ?? [];
+            const inst = res.data.instrumentation || {};
+
+            if (elements.btreeCountryResultBadge) elements.btreeCountryResultBadge.textContent = code;
+            if (elements.btreeCountryResultTitle) {
+                elements.btreeCountryResultTitle.textContent = `${total} cliente(s) agrupado(s) com eSIM em ${code}`;
+            }
+            if (elements.btreeCountryResultMetrics) {
+                elements.btreeCountryResultMetrics.textContent = `B-Tree Secundária: ${inst.last_search_nodes_visited ?? 0} nós visitados · ${inst.last_search_comparisons ?? 0} comp.`;
+            }
+
+            if (elements.btreeCountryChipsList) {
+                elements.btreeCountryChipsList.innerHTML = '';
+                if (rawClients.length === 0) {
+                    elements.btreeCountryChipsList.innerHTML = '<span class="placeholder">Nenhum cliente cadastrado neste país.</span>';
+                    return;
+                }
+
+                rawClients.forEach(c => {
+                    const clientId = (typeof c === 'object' && c !== null) ? c.id : c;
+                    const clientName = (typeof c === 'object' && c !== null) ? c.name : '';
+
+                    const chip = document.createElement('button');
+                    chip.type = 'button';
+                    chip.className = 'btree-client-chip';
+                    chip.innerHTML = `<span class="chip-id">#${clientId}</span>${clientName ? ` <span class="chip-name">${clientName}</span>` : ''}`;
+                    chip.title = `Clique para ver ${clientName || `cliente #${clientId}`} no painel`;
+                    chip.addEventListener('click', async () => {
+                        await selectClient(clientId);
+                        const item = document.querySelector(`#admin-clients-list li[data-id="${clientId}"]`);
+                        if (item) item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    });
+                    elements.btreeCountryChipsList.appendChild(chip);
+                });
+            }
+        } else {
+            if (elements.btreeCountryChipsList) {
+                elements.btreeCountryChipsList.innerHTML = '<span class="placeholder" style="color: #dc2626;">Erro ao consultar clientes do país na Árvore B secundária.</span>';
+            }
+        }
+    } catch (err) {
+        console.error('Erro na consulta por país:', err);
+        if (elements.btreeCountryChipsList) {
+            elements.btreeCountryChipsList.innerHTML = '<span class="placeholder" style="color: #dc2626;">Ocorreu um erro ao carregar os clientes.</span>';
+        }
+    }
 }
 
 async function loadClients() {
@@ -107,6 +302,7 @@ async function selectClient(clientId) {
     }
 
     renderClientDetails(client);
+    await refreshBTreeInstrumentation();
 }
 
 function renderClientDetails(client) {
@@ -238,6 +434,7 @@ async function handleDeleteClient(client) {
             elements.detailsCard.innerHTML = '<p class="placeholder">Selecione um cliente na lista acima para visualizar, editar ou deletar.</p>';
         }
         await loadClients();
+        await refreshBTreeInstrumentation();
     } else {
         alert(res.data?.error || 'Erro ao excluir o cliente.');
     }
@@ -249,6 +446,13 @@ function bindEvents() {
     });
 
     elements.cancelBtn?.addEventListener('click', resetForm);
+
+    elements.btreeSearchForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        handleBTreeSearch(elements.btreeSearchInput?.value);
+    });
+
+    elements.btnQueryCountryClients?.addEventListener('click', handleQueryCountryClients);
 
     elements.form?.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -287,6 +491,7 @@ function bindEvents() {
             resetForm();
             await loadClients();
             await selectClient(savedId);
+            await refreshBTreeInstrumentation();
         } else {
             if (elements.feedback) {
                 elements.feedback.className = 'feedback-msg error';
