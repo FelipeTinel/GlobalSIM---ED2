@@ -2,13 +2,14 @@ from typing import TypedDict, Any
 from app.models.btree import BTree
 from app.repository.client import ClientRepository
 
-class Client(TypedDict):
+class Client(TypedDict, total=False):
     id: int
     name: str
     email: str
     esim: str
     pkg: int
     status: str
+    is_logged: bool
 
 class ClientManager:
 
@@ -57,6 +58,17 @@ class ClientManager:
                 all_clients[i] = updated_client
                 break
 
+        new_records = self.repo.save_all(all_clients)
+        self.btree = BTree(order=self.btree.order)
+        for cid, off in new_records:
+            self.btree.insert(cid, off)
+
+    def delete(self, client_id: int) -> None:
+        record = self.btree.search(client_id)
+        if not record:
+            raise KeyError(f"Client with ID {client_id} not found")
+
+        all_clients = [c for c in self.get_all() if c["id"] != client_id]
         new_records = self.repo.save_all(all_clients)
         self.btree = BTree(order=self.btree.order)
         for cid, off in new_records:

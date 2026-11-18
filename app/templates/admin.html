@@ -14,10 +14,22 @@
 <body>
     <header class="top-bar">
         <h1>Painel Administrativo - GlobalSIM</h1>
-        <a href="{{ url_for('home.index') }}" class="nav-link"><i class="bi bi-arrow-down-left-square-fill"></i> Consulta de Cobertura</a>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <a href="{{ url_for('client.session_page') }}" class="nav-link"><i class="bi bi-person-circle"></i> Sessão / Login</a>
+            <a href="{{ url_for('home.index') }}" class="nav-link"><i class="bi bi-arrow-down-left-square-fill"></i> Consulta de Cobertura</a>
+        </div>
     </header>
 
-    <main class="admin-layout">
+    <nav class="admin-tabs-bar">
+        <button type="button" class="admin-tab-btn active" id="tab-admin-countries">
+            <i class="bi bi-globe-americas"></i> Gerenciar Países
+        </button>
+        <button type="button" class="admin-tab-btn" id="tab-admin-clients">
+            <i class="bi bi-people-fill"></i> Gerenciar Clientes
+        </button>
+    </nav>
+
+    <main class="admin-layout" id="section-admin-countries">
         <section class="card">
             <h2 class="section-title" id="form-title">Cadastrar País</h2>
             <p class="form-mode" id="form-mode" hidden>Editando: <b id="editing-label"></b></p>
@@ -187,5 +199,94 @@
             <div id="admin-map"></div>
         </section>
     </main>
+
+    <!-- Seção de Gerenciamento de Clientes (Árvore B) -->
+    <main class="admin-layout" id="section-admin-clients" hidden>
+        <!-- Coluna Esquerda: Formulário de Cadastro e Edição de Clientes -->
+        <section class="card">
+            <h2 class="section-title" id="client-form-title">
+                <i class="bi bi-person-gear"></i> Cadastrar Cliente
+            </h2>
+            <p class="form-mode" id="client-form-mode" hidden>
+                Modo Edição: <b id="client-editing-label"></b>
+            </p>
+
+            <form id="admin-client-form">
+                <div class="form-group">
+                    <label for="admin-client-id" class="form-label">ID do Cliente (único na Árvore B):</label>
+                    <input type="number" id="admin-client-id" class="form-input" placeholder="Ex: 58385" required />
+                </div>
+                <div class="form-group">
+                    <label for="admin-client-name" class="form-label">Nome Completo:</label>
+                    <input type="text" id="admin-client-name" class="form-input" placeholder="Ex: Maria Silva" required />
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="admin-client-email" class="form-label">E-mail:</label>
+                        <input type="email" id="admin-client-email" class="form-input" placeholder="maria@email.com" />
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-client-esim" class="form-label">Código eSIM:</label>
+                        <input type="text" id="admin-client-esim" class="form-input" placeholder="ESIM-12345" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="admin-client-pkg" class="form-label">Plano / Pacote (pkg):</label>
+                        <input type="number" id="admin-client-pkg" class="form-input" value="101" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-client-status" class="form-label">Status eSIM:</label>
+                        <select id="admin-client-status" class="form-select">
+                            <option value="ativo" selected>Ativo</option>
+                            <option value="inativo">Inativo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="admin-client-logged" class="form-label">Estado da Sessão:</label>
+                    <select id="admin-client-logged" class="form-select">
+                        <option value="false" selected>Deslogado</option>
+                        <option value="true">Logado</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary" id="client-submit-btn">Salvar Cliente</button>
+                    <button type="button" class="btn-secondary" id="client-cancel-btn" hidden>Cancelar Edição</button>
+                </div>
+            </form>
+
+            <div id="admin-client-feedback" class="feedback-msg info" hidden></div>
+        </section>
+
+        <!-- Coluna Direita: Lista de Clientes e Detalhes Selecionados -->
+        <div class="right-col">
+            <!-- Card de Listagem de Clientes -->
+            <section class="card">
+                <div class="clients-list-header">
+                    <h2 class="section-title" style="margin-bottom: 0;">
+                        Clientes Cadastrados <span class="badge" id="admin-clients-count">0</span>
+                    </h2>
+                    <input
+                        type="search"
+                        id="admin-clients-search"
+                        class="form-input"
+                        placeholder="Buscar por ID ou Nome..."
+                        style="max-width: 250px;"
+                    />
+                </div>
+                <ul id="admin-clients-list" class="admin-clients-scroll-list">
+                    <li class="placeholder">Carregando clientes...</li>
+                </ul>
+            </section>
+
+            <!-- Card de Detalhes do Cliente Selecionado com Ações de Editar e Deletar -->
+            <section class="card" id="admin-client-details-card">
+                <p class="placeholder">Selecione um cliente na lista acima para visualizar, editar ou deletar.</p>
+            </section>
+        </div>
+    </main>
+
 </body>
 </html>

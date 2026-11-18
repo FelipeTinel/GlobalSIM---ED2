@@ -5,6 +5,7 @@ import { renderList, markActive } from './list.js';
 import { renderDetails } from './details.js';
 import { bindForm, fillForm, readForm, resetForm } from './form.js';
 import { bindInstrumentationSearch, renderInstrumentation, renderSearchFeedback } from './instrumentation.js';
+import { initAdminClients } from './clients.js';
 
 const handlers = {
     onSelect: selectCountry,
@@ -141,10 +142,34 @@ async function handleSubmit() {
     if (key) selectCountry(key);
 }
 
+function setupAdminTabs() {
+    const tabCountries = document.getElementById('tab-admin-countries');
+    const tabClients = document.getElementById('tab-admin-clients');
+    const secCountries = document.getElementById('section-admin-countries');
+    const secClients = document.getElementById('section-admin-clients');
+
+    tabCountries?.addEventListener('click', () => {
+        tabCountries.classList.add('active');
+        tabClients?.classList.remove('active');
+        secCountries?.removeAttribute('hidden');
+        secClients?.setAttribute('hidden', '');
+    });
+
+    tabClients?.addEventListener('click', () => {
+        tabClients.classList.add('active');
+        tabCountries?.classList.remove('active');
+        secClients?.removeAttribute('hidden');
+        secCountries?.setAttribute('hidden', '');
+    });
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     console.log("Painel do ADM funcional");
+    setupAdminTabs();
     initMap();
     bindForm({ onSubmit: handleSubmit, onCancel: cancelEdit });
     bindInstrumentationSearch(handleSimulateSearch);
     await loadCountries();
+    await initAdminClients();
 });
+
