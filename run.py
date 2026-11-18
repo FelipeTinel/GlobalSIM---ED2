@@ -1,4 +1,6 @@
 from flask import Flask
+import app.models.country as country_module
+
 from app.routes.home import home_bp
 from app.routes.admin import admin_bp
 from app.routes.client import clients_bp
@@ -11,3 +13,4 @@ app.register_blueprint(clients_bp)
 
 if __name__ == "__main__":
     app.run(debug=True)
+

@@ -24,6 +24,7 @@ def get_client(client_id: int):
     if not client:
         return jsonify({"error": "Client not found"}), 404
 
+    # Ensure presence of is_logged attribute (default False)
     if "is_logged" not in client:
         client["is_logged"] = False
 
@@ -104,6 +105,21 @@ def update_client(client_id: int):
         return jsonify(updated_client), 200
     except (KeyError, ValueError) as err:
         return jsonify({"error": str(err)}), 400
+
+
+@clients_bp.route('/clients/<int:client_id>', methods=['DELETE'])
+def delete_client(client_id: int):
+    existing = client_manager.get(client_id)
+    if not existing:
+        return jsonify({"error": "Client not found"}), 404
+
+    try:
+        client_manager.delete(client_id)
+        return jsonify({"message": f"Client with ID {client_id} successfully deleted", "id": client_id}), 200
+    except KeyError:
+        return jsonify({"error": "Client not found"}), 404
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
 
 
 @clients_bp.route('/clients/country/<string:country_code>', methods=['GET'])

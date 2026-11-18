@@ -14,17 +14,87 @@
         window.initialPoint = {{ point | tojson }};
         window.initialSearchedCode = {{ (searched_code or '') | tojson }};
     </script>
-    <script defer type="module" src="{{ url_for('static', filename='js/home.js') }}"></script>
+    <script defer type="module" src="{{ url_for('static', filename='js/home/main.js') }}"></script>
 </head>
 <body>
     <header class="hero-header">
-        <a href="{{ url_for('admin.admin_page') }}" class="nav-link hero-nav">Painel Administrativo <i class="bi bi-arrow-down-right-square-fill"></i></a>
+        <div class="hero-nav">
+            <a href="{{ url_for('client.session_page') }}" class="nav-link" id="nav-account-btn">
+                <i class="bi bi-person-circle"></i> <span id="account-btn-text">Minha Conta / Login</span>
+            </a>
+            <a href="{{ url_for('admin.admin_page') }}" class="nav-link">
+                Painel Administrativo <i class="bi bi-arrow-down-right-square-fill"></i>
+            </a>
+        </div>
         <h1 class="hero-title"><i class="bi bi-globe2"></i> GlobalSIM</h1>
         <p class="hero-tagline">Fronteiras no mapa, nunca na sua conexão.</p>
         <p class="hero-subtitle">
             A GlobalSIM oferece internet móvel por eSIM para viajantes internacionais com ativação instantânea nas principais operadoras do mundo. Consulte abaixo a disponibilidade no seu próximo destino.
         </p>
+        <div class="hero-actions">
+            <button type="button" class="btn-hero-cta" id="btn-open-create-account">
+                <i class="bi bi-person-plus-fill"></i> Criar Conta eSIM
+            </button>
+            <a href="{{ url_for('client.session_page') }}" class="nav-link">
+                <i class="bi bi-box-arrow-in-right"></i> Já sou cliente
+            </a>
+        </div>
     </header>
+
+    <!-- Modal de Criação de Conta na Home -->
+    <div id="modal-create-account" class="modal-overlay" hidden>
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="bi bi-person-vcard-fill"></i> Criar Nova Conta</h3>
+                <button type="button" class="modal-close-btn" id="btn-close-modal" aria-label="Fechar">&times;</button>
+            </div>
+            <p class="modal-subtitle">Cadastre seu perfil de viajante e conecte-se instantaneamente.</p>
+
+            <form id="home-create-client-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="home-client-id" class="form-label">ID do Cliente (único):</label>
+                        <input type="number" id="home-client-id" class="form-input" placeholder="Ex: 58385" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="home-client-name" class="form-label">Nome Completo:</label>
+                        <input type="text" id="home-client-name" class="form-input" placeholder="Ex: Maria Silva" required />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="home-client-email" class="form-label">E-mail:</label>
+                        <input type="email" id="home-client-email" class="form-input" placeholder="Ex: maria@email.com" />
+                    </div>
+                    <div class="form-group">
+                        <label for="home-client-esim" class="form-label">Código eSIM:</label>
+                        <input type="text" id="home-client-esim" class="form-input" placeholder="Ex: ESIM-86937" />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="home-client-pkg" class="form-label">Plano / Pacote (pkg):</label>
+                        <input type="number" id="home-client-pkg" class="form-input" value="101" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="home-client-status" class="form-label">Status do eSIM:</label>
+                        <select id="home-client-status" class="form-select">
+                            <option value="ativo" selected>Ativo</option>
+                            <option value="inativo">Inativo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 8px;">
+                    <i class="bi bi-check-circle-fill"></i> Finalizar Cadastro
+                </button>
+            </form>
+
+            <div id="home-modal-feedback" class="feedback-msg info" hidden></div>
+        </div>
+    </div>
 
     <div class="dashboard-container">
         <div id="map"></div>

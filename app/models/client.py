@@ -126,6 +126,25 @@ class ClientManager:
         for country_code, country_offset in country_records:
             self.country_btree.insert(country_code, country_offset)
 
+    def delete(self, client_id: int) -> None:
+        record = self.btree.search(client_id)
+        if not record:
+            raise KeyError(f"Client with ID {client_id} not found")
+
+        all_clients = [client for client in self.get_all() if client["id"] != client_id]
+        new_records = self.repo.save_all(all_clients)
+        self.btree = BTree(order=self.btree.order)
+        country_groups: dict[str, list[int]] = {}
+        for current_id, country, offset in new_records:
+            self.btree.insert(current_id, offset)
+            if country:
+                country_groups.setdefault(country, []).append(current_id)
+
+        self.country_btree = BTree(order=self.country_btree.order)
+        country_records = self.repo.save_country_index(country_groups)
+        for country_code, country_offset in country_records:
+            self.country_btree.insert(country_code, country_offset)
+
     def get_instrumentation(self) -> dict[str, Any]:
         inst = self.btree.get_instrumentation()
         inst["secondary"] = self.country_btree.get_instrumentation()
