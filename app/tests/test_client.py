@@ -69,7 +69,7 @@ def test_update_nonexistent_raises_key_error(manager, sample_client):
 
 
 def test_get_all_returns_in_order(manager, sample_client):
-    # Inserção fora de ordem para testar o percurso in_order da Árvore B
+    # Out-of-order insertion to test B-Tree in-order traversal
     ids = [50000, 20000, 80000, 10000, 30000]
     for cid in ids:
         c = {**sample_client, "id": cid, "name": f"Cliente {cid}"}
@@ -88,7 +88,7 @@ def test_jsonl_persistence_reload(tmp_path, sample_client):
     c2 = {**sample_client, "id": 20002, "name": "João Pereira"}
     mgr1.create(c2)
 
-    # Nova instância recarregando do mesmo arquivo jsonl
+    # New instance reloading from the same jsonl file
     mgr2 = ClientManager(filepath=filepath, order=5)
     assert mgr2.btree.total_keys == 2
     assert mgr2.get(10001) == sample_client
@@ -108,7 +108,7 @@ def test_instrumentation_after_search(manager, sample_client):
 
 
 def test_btree_splits_and_height(tmp_path, sample_client):
-    # Ordem baixa (3) para forçar divisões (splits) com poucos registros
+    # Low order (3) to force splits with fewer records
     filepath = str(tmp_path / "splits_test.jsonl")
     low_order_mgr = ClientManager(filepath=filepath, order=3)
 
@@ -121,6 +121,55 @@ def test_btree_splits_and_height(tmp_path, sample_client):
     assert inst["splits_count"] > 0
     assert inst["height"] >= 2
 
-    # Garante que todos continuam acessíveis após os splits
+    # Ensure all keys remain accessible after splits
     for cid in range(100, 115):
         assert low_order_mgr.get(cid) is not None
+
+
+def test_secondary_btree_grouping_by_country(manager, sample_client):
+    c1 = {**sample_client, "id": 10001, "country": "BR", "name": "Cliente BR 1"}
+    c2 = {**sample_client, "id": 10002, "country": "BR", "name": "Cliente BR 2"}
+    c3 = {**sample_client, "id": 10003, "country": "US", "name": "Cliente US 1"}
+
+    manager.create(c1)
+    manager.create(c2)
+    manager.create(c3)
+
+    # Verify that countries are indexed in the secondary B-Tree
+    assert manager.country_btree.total_keys == 2
+    assert manager.country_btree.search("BR") is not None
+    assert manager.country_btree.search("US") is not None
+
+    # Query Brazil clients via the secondary index differential
+    br_clients = manager.get_by_country("BR")
+    assert len(br_clients) == 2
+    br_ids = [c["id"] for c in br_clients]
+    assert 10001 in br_ids
+    assert 10002 in br_ids
+
+    # Query US clients
+    us_clients = manager.get_by_country("US")
+    assert len(us_clients) == 1
+    assert us_clients[0]["id"] == 10003
+
+    # Query non-existent country
+    assert manager.get_by_country("JP") == []
+    assert manager.get_by_country("") == []
+
+
+def test_update_client_country_updates_secondary_btree(manager, sample_client):
+    c1 = {**sample_client, "id": 10001, "country": "BR"}
+    manager.create(c1)
+
+    assert len(manager.get_by_country("BR")) == 1
+    assert len(manager.get_by_country("ES")) == 0
+
+    # Update client country from BR to ES
+    updated = c1.copy()
+    updated["country"] = "ES"
+    manager.update(10001, updated)
+
+    assert len(manager.get_by_country("BR")) == 0
+    es_clients = manager.get_by_country("ES")
+    assert len(es_clients) == 1
+    assert es_clients[0]["id"] == 10001

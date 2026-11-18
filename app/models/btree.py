@@ -37,7 +37,7 @@ class BTree:
             height += 1
         return height
 
-    def search(self, key: int, node: BTreeNode = None) -> Record | None:
+    def search(self, key: int | str, node: BTreeNode = None) -> Record | None:
         is_external_call = node is None
         if is_external_call:
             self.last_search_key = key
@@ -65,7 +65,7 @@ class BTree:
         return self.search(key, node.children[i])
 
     def in_order(self) -> list[Record]:
-        """Retorna todos os registros em ordem crescente de chave."""
+        """Returns all records in ascending key order."""
         records: list[Record] = []
         if self.root is not None:
             self._in_order_node(self.root, records)
@@ -79,9 +79,9 @@ class BTree:
         if not node.is_leaf():
             self._in_order_node(node.children[node.num_keys], records)
 
-    def insert(self, key: int, offset: int):
+    def insert(self, key: int | str, offset: int):
         if self.search(key) is not None:
-            raise KeyError(f"Chave {key} já cadastrada na Árvore B.")
+            raise KeyError(f"Key {key} already exists in the B-Tree.")
 
         self.last_search_key = None
         self.last_search_comparisons = 0

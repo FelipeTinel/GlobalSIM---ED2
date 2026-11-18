@@ -1,58 +1,89 @@
 import json
 import random
+import unicodedata
 from pathlib import Path
 
-NOMES = [
+TEAM_FIXED_NAMES = [
+    ("Felipe", "Tinel"),
+    ("Mirella", "Costa"),
+    ("Enzo", "Schubach"),
+    ("Maria Inés", "Restovic"),
+]
+
+NAMES = [
     "Maria", "João", "Ana", "Carlos", "Beatriz", "Lucas", "Fernanda", "Pedro",
     "Juliana", "Gabriel", "Mariana", "Rafael", "Camila", "Matheus", "Larissa",
     "Thiago", "Amanda", "Bruno", "Letícia", "Felipe", "Sofia", "Rodrigo",
-    "Carla", "Diego", "Patricia", "Gustavo", "Vanessa", "Leonardo", "Bruna", "Eduardo"
+    "Carla", "Diego", "Patricia", "Gustavo", "Vanessa", "Leonardo", "Bruna", "Eduardo",
+    "Mirella", "Enzo"
 ]
 
-SOBRENOMES = [
+SURNAMES = [
     "Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira", "Alves",
     "Pereira", "Lima", "Gomes", "Costa", "Ribeiro", "Martins", "Carvalho",
     "Almeida", "Lopes", "Soares", "Fernandes", "Vieira", "Barbosa", "Rocha",
-    "Dias", "Nascimento", "Andrade", "Moreira", "Nunes", "Marques", "Machado"
+    "Dias", "Nascimento", "Andrade", "Moreira", "Nunes", "Marques", "Machado",
+    "Tinel", "Schubach", "Restovic"
 ]
 
-PACOTES_PADRAO = [101, 102, 103, 104, 105, 201, 202, 203]
-STATUS_OPCOES = ["ativo", "ativo", "ativo", "inativo"]
+DEFAULT_PACKAGES = [101, 102, 103, 104, 105, 201, 202, 203]
+STATUS_OPTIONS = ["ativo", "ativo", "ativo", "inativo"]
 
 
-def gerar_clientes(total: int = 1000, caminho_saida: Path = None):
-    if caminho_saida is None:
-        raiz_projeto = Path(__file__).resolve().parent.parent
-        caminho_saida = raiz_projeto / "app" / "data" / "clients.jsonl"
+def load_available_countries(project_root: Path) -> list[str]:
+    countries_path = project_root / "app" / "data" / "countries.json"
+    if countries_path.exists():
+        try:
+            with open(countries_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                codes = [item["code"].strip().upper() for item in data if "code" in item and item["code"].strip()]
+                if codes:
+                    return codes
+        except Exception:
+            pass
+    return ["BR", "US", "ES", "PT", "IT", "CA", "JP", "KR", "CR"]
 
-    caminho_saida.parent.mkdir(parents=True, exist_ok=True)
 
-    ids_unicos = random.sample(range(10000, 100000), total)
+def generate_clients(total: int = 1000, output_path: Path = None):
+    project_root = Path(__file__).resolve().parent.parent
+    if output_path is None:
+        output_path = project_root / "app" / "data" / "clients.jsonl"
 
-    with open(caminho_saida, "w", encoding="utf-8") as f:
-        for cliente_id in ids_unicos:
-            nome = random.choice(NOMES)
-            sobrenome = random.choice(SOBRENOMES)
-            nome_completo = f"{nome} {sobrenome}"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    available_countries = load_available_countries(project_root)
+
+    unique_ids = random.sample(range(10000, 100000), total)
+
+    name_pairs = list(TEAM_FIXED_NAMES)
+    while len(name_pairs) < total:
+        name_pairs.append((random.choice(NAMES), random.choice(SURNAMES)))
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        for client_id, (first_name, last_name) in zip(unique_ids, name_pairs):
+            full_name = f"{first_name} {last_name}"
             
-            email = f"{nome.lower()}.{sobrenome.lower()}{cliente_id % 1000}@email.com"
+            first_name_ascii = unicodedata.normalize('NFKD', first_name.lower()).encode('ASCII', 'ignore').decode('utf-8').replace(' ', '.')
+            last_name_ascii = unicodedata.normalize('NFKD', last_name.lower()).encode('ASCII', 'ignore').decode('utf-8').replace(' ', '.')
+            email = f"{first_name_ascii}.{last_name_ascii}{client_id % 1000}@email.com"
             esim = f"ESIM-{random.randint(10000, 99999)}"
-            pacote = random.choice(PACOTES_PADRAO)
-            status = random.choice(STATUS_OPCOES)
+            package = random.choice(DEFAULT_PACKAGES)
+            country = random.choice(available_countries)
+            status = random.choice(STATUS_OPTIONS)
 
-            registro = {
-                "id": cliente_id,
-                "nome": nome_completo,
+            record = {
+                "id": client_id,
+                "name": full_name,
                 "email": email,
                 "esim": esim,
-                "pacote": pacote,
+                "pkg": package,
+                "country": country,
                 "status": status
             }
 
-            f.write(json.dumps(registro, ensure_ascii=False) + "\n")
+            f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
-    print(f"Sucesso! {total} clientes gerados em: {caminho_saida}")
+    print(f"Success! {total} clients generated in: {output_path}")
 
 
 if __name__ == "__main__":
-    gerar_clientes()
+    generate_clients()

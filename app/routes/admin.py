@@ -1,7 +1,8 @@
-from app.models.country import countries_manager
+from app.models.country import CountriesManager
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+countries_manager = CountriesManager()
 
 
 def _extract_payload() -> dict:
