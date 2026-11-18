@@ -63,3 +63,21 @@ export async function deleteClient(clientId) {
     }
 }
 
+export async function getClientInstrumentation() {
+    try {
+        return await request(`${BASE}/instrumentation`, 'GET');
+    } catch (error) {
+        console.error('Erro ao obter instrumentação da Árvore B:', error);
+        return { ok: false, status: 0, data: {} };
+    }
+}
+
+export async function getClientsByCountry(countryCode) {
+    try {
+        return await request(`${BASE}/country/${encodeURIComponent(countryCode)}`, 'GET');
+    } catch (error) {
+        console.error('Erro ao buscar clientes por país:', error);
+        return { ok: false, status: 0, data: {} };
+    }
+}
+

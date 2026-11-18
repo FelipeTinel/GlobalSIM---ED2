@@ -1,4 +1,5 @@
 from app.models.country import CountriesManager
+from app.routes.client import client_manager
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -29,10 +30,12 @@ def admin_page():
         key=lambda c: (c.get("country") or "").lower()
     )
     instrumentation = countries_manager.get_instrumentation()
+    client_instrumentation = client_manager.get_instrumentation()
     return render_template(
         'admin.html',
         countries=countries,
         instrumentation=instrumentation,
+        client_instrumentation=client_instrumentation,
     )
 
 

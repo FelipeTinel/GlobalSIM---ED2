@@ -286,6 +286,151 @@
                 <p class="placeholder">Selecione um cliente na lista acima para visualizar, editar ou deletar.</p>
             </section>
         </div>
+
+        <!-- Card de Instrumentação da Árvore B (Clientes e Índice Secundário) -->
+        <section class="card instrumentation-card" id="btree-instrumentation-card">
+            <div class="inst-header">
+                <h2 class="section-title">
+                    <i class="bi bi-diagram-3-fill"></i> Instrumentação da Árvore B
+                    <span class="badge" id="btree-order-badge">Ordem M = {{ client_instrumentation.order if client_instrumentation is defined else 5 }}</span>
+                </h2>
+                <form id="btree-search-form" class="inst-search-form">
+                    <input
+                        type="number"
+                        id="btree-search-input"
+                        class="form-input inst-search-input"
+                        placeholder="ID (ex: 58385)"
+                        autocomplete="off"
+                        required
+                    >
+                    <button type="submit" class="btn-primary inst-search-btn">
+                        <i class="bi bi-search"></i> Simular Busca
+                    </button>
+                </form>
+            </div>
+
+            <!-- Feedback da Busca na Árvore B -->
+            <p class="form-mode" id="btree-search-feedback" hidden></p>
+
+            <h3 class="subsection-title">
+                <i class="bi bi-tree-fill"></i> Árvore B Principal (ID do Cliente &rarr; Offset em clients.jsonl)
+            </h3>
+            <div class="info-grid inst-metrics-grid" id="btree-primary-metrics">
+                <div class="metric-box">
+                    <span class="info-label">Clientes Indexados (N)</span>
+                    <span class="info-value" id="btree-metric-keys">{{ client_instrumentation.total_keys if client_instrumentation is defined else 0 }}</span>
+                    <span class="metric-sub">Registros na Árvore B</span>
+                </div>
+                <div class="metric-box">
+                    <span class="info-label">Ordem da Árvore (M)</span>
+                    <span class="info-value" id="btree-metric-order">{{ client_instrumentation.order if client_instrumentation is defined else 5 }}</span>
+                    <span class="metric-sub">Capacidade máx. de chaves</span>
+                </div>
+                <div class="metric-box">
+                    <span class="info-label">Altura da Árvore (h)</span>
+                    <span class="info-value" id="btree-metric-height">{{ client_instrumentation.height if client_instrumentation is defined else 0 }}</span>
+                    <span class="metric-sub">Níveis da raiz às folhas</span>
+                </div>
+                <div class="metric-box">
+                    <span class="info-label">Divisões (Splits)</span>
+                    <span class="info-value" id="btree-metric-splits">{{ client_instrumentation.splits_count if client_instrumentation is defined else 0 }}</span>
+                    <span class="metric-sub">Nós divididos na inserção</span>
+                </div>
+                <div class="metric-box">
+                    <span class="info-label">Última Busca</span>
+                    <span class="info-value" id="btree-metric-last-search">
+                        {% if client_instrumentation is defined and client_instrumentation.last_search_key %}
+                            {{ client_instrumentation.last_search_comparisons }} comp. ({{ client_instrumentation.last_search_nodes_visited }} nós)
+                        {% else %}
+                            0 comp.
+                        {% endif %}
+                    </span>
+                    <span class="metric-sub" id="btree-metric-last-key">
+                        {% if client_instrumentation is defined and client_instrumentation.last_search_key %}
+                            Chave #{{ client_instrumentation.last_search_key }}
+                        {% else %}
+                            Nenhuma busca recente
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="metric-box">
+                    <span class="info-label">Complexidade Teórica</span>
+                    <span class="info-value">O(log_M N)</span>
+                    <span class="metric-sub">Busca e inserção eficientes</span>
+                </div>
+            </div>
+
+            <!-- Diferencial da Equipe: Árvore B Secundária -->
+            <h3 class="subsection-title" style="margin-top: 24px;">
+                <i class="bi bi-diagram-2-fill"></i> Diferencial: Árvore B Secundária (País &rarr; Agrupamento em country_clients.jsonl)
+            </h3>
+            <div class="info-grid inst-metrics-grid" id="btree-secondary-metrics">
+                <div class="metric-box">
+                    <span class="info-label">Países Indexados</span>
+                    <span class="info-value" id="btree-sec-metric-keys">{{ client_instrumentation.secondary.total_keys if client_instrumentation is defined and client_instrumentation.secondary is defined else 0 }}</span>
+                    <span class="metric-sub">Chaves de países no índice</span>
+                </div>
+                <div class="metric-box">
+                    <span class="info-label">Altura (Secundária)</span>
+                    <span class="info-value" id="btree-sec-metric-height">{{ client_instrumentation.secondary.height if client_instrumentation is defined and client_instrumentation.secondary is defined else 0 }}</span>
+                    <span class="metric-sub">Níveis da árvore secundária</span>
+                </div>
+                <div class="metric-box">
+                    <span class="info-label">Splits (Secundária)</span>
+                    <span class="info-value" id="btree-sec-metric-splits">{{ client_instrumentation.secondary.splits_count if client_instrumentation is defined and client_instrumentation.secondary is defined else 0 }}</span>
+                    <span class="metric-sub">Divisões de nós por país</span>
+                </div>
+                <div class="metric-box">
+                    <span class="info-label">Busca Secundária</span>
+                    <span class="info-value" id="btree-sec-metric-last-search">
+                        {% if client_instrumentation is defined and client_instrumentation.secondary is defined and client_instrumentation.secondary.last_search_key %}
+                            {{ client_instrumentation.secondary.last_search_comparisons }} comp. ({{ client_instrumentation.secondary.last_search_nodes_visited }} nós)
+                        {% else %}
+                            0 comp.
+                        {% endif %}
+                    </span>
+                    <span class="metric-sub" id="btree-sec-metric-last-key">
+                        {% if client_instrumentation is defined and client_instrumentation.secondary is defined and client_instrumentation.secondary.last_search_key %}
+                            País "{{ client_instrumentation.secondary.last_search_key }}"
+                        {% else %}
+                            Nenhuma consulta por país
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Consulta Interativa do Diferencial (Agrupamento por País) -->
+            <div class="btree-secondary-query-box">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+                    <div>
+                        <strong style="color: #0f172a; font-size: 0.92rem;"><i class="bi bi-funnel"></i> Consultar Agrupamento por País (Índice Secundário):</strong>
+                        <p class="metric-sub" style="margin: 2px 0 0 0;">Recupera todos os clientes do país em O(log N) acessando o offset no arquivo secundário</p>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <select id="btree-country-select" class="form-select" style="min-width: 140px; padding: 7px 10px; border-radius: 6px; border: 1px solid #cbd5e1; font-weight: 600;">
+                            <option value="">Selecione o País...</option>
+                            {% if countries %}
+                                {% for c in countries %}
+                                    <option value="{{ c.code }}">{{ c.country }} ({{ c.code | upper }})</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                        <button type="button" class="btn-primary" id="btn-query-country-clients" style="padding: 7px 14px; flex: 0 0 auto;">
+                            <i class="bi bi-search"></i> Consultar
+                        </button>
+                    </div>
+                </div>
+
+                <div id="btree-country-result-box" class="btree-country-result" hidden>
+                    <div class="btree-country-result-header">
+                        <span id="btree-country-result-badge" class="badge" style="background: #2563eb; color: #fff; font-size: 0.82rem; padding: 4px 10px;">-</span>
+                        <span id="btree-country-result-title" style="font-weight: 700; color: #0f172a;">0 clientes encontrados</span>
+                        <span id="btree-country-result-metrics" class="metric-sub" style="margin-left: auto;"></span>
+                    </div>
+                    <div id="btree-country-chips-list" class="btree-chips-list"></div>
+                </div>
+            </div>
+        </section>
     </main>
 
 </body>
