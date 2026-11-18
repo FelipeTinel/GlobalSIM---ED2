@@ -53,3 +53,13 @@ export async function updateClient(clientId, clientData) {
         return { ok: false, status: 0, data: { error: 'Falha na conexão com o servidor' } };
     }
 }
+
+export async function deleteClient(clientId) {
+    try {
+        return await request(`${BASE}/${encodeURIComponent(clientId)}`, 'DELETE');
+    } catch (error) {
+        console.error('Erro ao deletar cliente:', error);
+        return { ok: false, status: 0, data: { error: 'Falha na conexão com o servidor' } };
+    }
+}
+

@@ -998,3 +998,4 @@
 {"id": 72004, "name": "Lucas Costa", "email": "lucas.costa4@email.com", "esim": "ESIM-64923", "pkg": 104, "status": "inativo"}
 {"id": 80748, "name": "Matheus Ferreira", "email": "matheus.ferreira748@email.com", "esim": "ESIM-86544", "pkg": 203, "status": "ativo"}
 {"id": 98932, "name": "Sofia Rocha", "email": "sofia.rocha932@email.com", "esim": "ESIM-49035", "pkg": 102, "status": "ativo"}
+{"id": 18566, "name": "Felipe Tinel", "email": "felipemacedotinel@gmail.com", "esim": "ESIM-111", "pkg": 100, "status": "ativo", "is_logged": true}

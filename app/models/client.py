@@ -63,5 +63,16 @@ class ClientManager:
         for cid, off in new_records:
             self.btree.insert(cid, off)
 
+    def delete(self, client_id: int) -> None:
+        record = self.btree.search(client_id)
+        if not record:
+            raise KeyError(f"Client with ID {client_id} not found")
+
+        all_clients = [c for c in self.get_all() if c["id"] != client_id]
+        new_records = self.repo.save_all(all_clients)
+        self.btree = BTree(order=self.btree.order)
+        for cid, off in new_records:
+            self.btree.insert(cid, off)
+
     def get_instrumentation(self) -> dict[str, Any]:
         return self.btree.get_instrumentation()

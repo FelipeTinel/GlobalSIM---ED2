@@ -7,6 +7,7 @@ import { getCountries, fetchCountryDetails } from './api.js';
 import { initMap, renderMarkers, focusCountry } from './map.js';
 import { renderList, markActive } from './list.js';
 import { renderCoverageAvailable, renderCoverageUnavailable, renderPlaceholder } from './details.js';
+import { checkSession, register } from '../session/auth.js';
 
 export function findCountryKey(code) {
     if (!code) return null;
@@ -102,7 +103,91 @@ export async function initHome() {
             }
         }
     }
+
+    initAccountModal();
 }
+
+async function initAccountModal() {
+    const accountBtnText = document.getElementById('account-btn-text');
+    const modal = document.getElementById('modal-create-account');
+    const openBtn = document.getElementById('btn-open-create-account');
+    const closeBtn = document.getElementById('btn-close-modal');
+    const form = document.getElementById('home-create-client-form');
+    const feedback = document.getElementById('home-modal-feedback');
+
+    // Verifica sessão e atualiza botão
+    try {
+        const session = await checkSession();
+        if (session.state === 'logged_in' && accountBtnText) {
+            accountBtnText.textContent = `Olá, ${session.client.name.split(' ')[0]}`;
+        }
+    } catch (e) {
+        console.warn('Erro ao checar sessão na Home:', e);
+    }
+
+    function openModal() {
+        if (modal) {
+            modal.removeAttribute('hidden');
+            if (feedback) feedback.hidden = true;
+            // Gera um ID sugestivo aleatório caso queira
+            const idInput = document.getElementById('home-client-id');
+            if (idInput && !idInput.value) {
+                idInput.value = Math.floor(10000 + Math.random() * 89999);
+            }
+        }
+    }
+
+    function closeModal() {
+        if (modal) modal.setAttribute('hidden', '');
+    }
+
+    openBtn?.addEventListener('click', openModal);
+    closeBtn?.addEventListener('click', closeModal);
+
+    modal?.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    form?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = {
+            id: document.getElementById('home-client-id')?.value?.trim(),
+            name: document.getElementById('home-client-name')?.value?.trim(),
+            email: document.getElementById('home-client-email')?.value?.trim(),
+            esim: document.getElementById('home-client-esim')?.value?.trim(),
+            pkg: document.getElementById('home-client-pkg')?.value?.trim(),
+            status: document.getElementById('home-client-status')?.value || 'ativo'
+        };
+
+        if (feedback) {
+            feedback.className = 'feedback-msg info';
+            feedback.textContent = 'Criando sua conta...';
+            feedback.hidden = false;
+        }
+
+        const result = await register(formData);
+
+        if (result.success) {
+            if (feedback) {
+                feedback.className = 'feedback-msg success';
+                feedback.textContent = result.message;
+            }
+            if (accountBtnText) {
+                accountBtnText.textContent = `Olá, ${result.client.name.split(' ')[0]}`;
+            }
+            form.reset();
+            setTimeout(() => {
+                closeModal();
+            }, 1800);
+        } else {
+            if (feedback) {
+                feedback.className = 'feedback-msg error';
+                feedback.textContent = result.message;
+            }
+        }
+    });
+}
+
 
 if (typeof document !== 'undefined') {
     document.addEventListener('DOMContentLoaded', () => {
