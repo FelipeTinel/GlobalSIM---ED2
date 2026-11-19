@@ -134,7 +134,7 @@ export function renderConnectivityResult(data) {
         <div class="structure-card-header">
             <i class="bi bi-diagram-3-fill"></i>
             <div>
-                <h4>Dados do Cliente (Árvore B)</h4>
+                <h4>Dados do Cliente</h4>
                 <span class="structure-sub">Busca por chave primária em O(log n)</span>
             </div>
         </div>
@@ -163,7 +163,7 @@ export function renderConnectivityResult(data) {
         <div class="structure-card-header">
             <i class="bi bi-hash"></i>
             <div>
-                <h4>Destino Consultado (Tabela Hash)</h4>
+                <h4>Destino Consultado</h4>
                 <span class="structure-sub">Indexação polinomial em O(1) médio</span>
             </div>
         </div>
