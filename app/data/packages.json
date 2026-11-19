@@ -1,0 +1,56 @@
+[
+    {
+        "code": 101,
+        "name": "Europa Basic",
+        "data": "5 GB",
+        "validity": "15 dias"
+    },
+    {
+        "code": 102,
+        "name": "Europa Plus",
+        "data": "10 GB",
+        "validity": "30 dias"
+    },
+    {
+        "code": 201,
+        "name": "América Basic",
+        "data": "5 GB",
+        "validity": "15 dias"
+    },
+    {
+        "code": 202,
+        "name": "América Plus",
+        "data": "15 GB",
+        "validity": "30 dias"
+    },
+    {
+        "code": 301,
+        "name": "Global",
+        "data": "20 GB",
+        "validity": "30 dias"
+    },
+    {
+        "code": 103,
+        "name": "Europa Ultra",
+        "data": "20 GB",
+        "validity": "30 dias"
+    },
+    {
+        "code": 104,
+        "name": "Américas & Europa Pass",
+        "data": "15 GB",
+        "validity": "30 dias"
+    },
+    {
+        "code": 105,
+        "name": "World Traveler Pro",
+        "data": "30 GB",
+        "validity": "60 dias"
+    },
+    {
+        "code": 203,
+        "name": "Ásia-Pacífico Plus",
+        "data": "10 GB",
+        "validity": "30 dias"
+    }
+]

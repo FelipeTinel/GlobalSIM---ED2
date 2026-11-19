@@ -148,15 +148,14 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="reg-pkg" class="form-label">Código do Pacote (pkg):</label>
-                        <input
-                            type="number"
-                            id="reg-pkg"
-                            class="form-input"
-                            placeholder="Ex: 101"
-                            value="101"
-                            required
-                        />
+                        <label for="reg-pkg" class="form-label">Plano / Pacote (pkg):</label>
+                        <select id="reg-pkg" class="form-select" required>
+                            {% for pkg in packages %}
+                            <option value="{{ pkg.code }}" {% if pkg.code == 101 %}selected{% endif %}>
+                                {{ pkg.code }} — {{ pkg.name }} ({{ pkg.data }} • {{ pkg.validity }})
+                            </option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="reg-status" class="form-label">Status do eSIM:</label>

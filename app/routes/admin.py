@@ -1,4 +1,5 @@
 from app.models.country import CountriesManager
+from app.models.package import packages_manager
 from app.routes.client import client_manager
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 
@@ -34,6 +35,7 @@ def admin_page():
     return render_template(
         'admin.html',
         countries=countries,
+        packages=packages_manager.get_all(),
         instrumentation=instrumentation,
         client_instrumentation=client_instrumentation,
     )

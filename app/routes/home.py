@@ -1,5 +1,6 @@
 from app.models.country import CountriesManager
 from app.models.connectivity import ConnectivityManager
+from app.models.package import packages_manager
 from app.routes.client import client_manager
 from flask import Blueprint, render_template, request, jsonify
 
@@ -45,6 +46,7 @@ def index():
         'home.html',
         point=initial_point,
         countries=countries,
+        packages=packages_manager.get_all(),
         searched_code=searched_code,
         coverage_result=coverage_result,
     )

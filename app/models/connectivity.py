@@ -1,16 +1,11 @@
 from typing import Any
 from app.models.client import ClientManager
 from app.models.country import CountriesManager
+from app.models.package import PackagesManager, packages_manager
 
 PACKAGE_NAMES: dict[int, str] = {
-    101: "Global Standard (5 GB)",
-    102: "Global Plus (10 GB)",
-    103: "Global Ultra (20 GB)",
-    104: "Americas & Europa Pass (15 GB)",
-    105: "World Traveler Pro (30 GB)",
-    201: "Regional Americas (10 GB)",
-    202: "Regional Europa (10 GB)",
-    203: "Regional Asia-Pacific (10 GB)",
+    pkg["code"]: f"{pkg['name']} ({pkg['data']} • {pkg['validity']})"
+    for pkg in packages_manager.get_all()
 }
 
 class ConnectivityManager:
@@ -19,9 +14,11 @@ class ConnectivityManager:
         self,
         client_manager: ClientManager | None = None,
         countries_manager: CountriesManager | None = None,
+        packages_mgr: PackagesManager | None = None,
     ):
         self.client_manager = client_manager or ClientManager()
         self.countries_manager = countries_manager or CountriesManager()
+        self.packages_manager = packages_mgr or packages_manager
 
     def _evaluate_connectivity(
         self, client: dict[str, Any], country: dict[str, Any] | None, code: str
@@ -67,7 +64,10 @@ class ConnectivityManager:
         connectivity_info = self._evaluate_connectivity(client, country, code)
 
         pkg_code = client.get("pkg")
-        pkg_name = PACKAGE_NAMES.get(pkg_code, f"Pacote #{pkg_code}")
+        pkg_info = self.packages_manager.get(pkg_code)
+        pkg_name = pkg_info["name"] if pkg_info else f"Pacote #{pkg_code}"
+        pkg_data = pkg_info["data"] if pkg_info else "—"
+        pkg_validity = pkg_info["validity"] if pkg_info else "—"
 
         return {
             "client": {
@@ -77,6 +77,8 @@ class ConnectivityManager:
                 "esim": client.get("esim"),
                 "pkg": pkg_code,
                 "pkg_name": pkg_name,
+                "pkg_data": pkg_data,
+                "pkg_validity": pkg_validity,
                 "status": client.get("status"),
                 "btree_search": {
                     "key": btree_inst.get("last_search_key"),

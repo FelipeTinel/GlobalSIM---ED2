@@ -173,3 +173,45 @@ def test_update_client_country_updates_secondary_btree(manager, sample_client):
     es_clients = manager.get_by_country("ES")
     assert len(es_clients) == 1
     assert es_clients[0]["id"] == 10001
+
+
+def test_packages_catalog_and_connectivity_integration(manager, sample_client):
+    from app.models.package import PackagesManager
+    from app.models.connectivity import ConnectivityManager
+
+    pkg_mgr = PackagesManager()
+    pkg_102 = pkg_mgr.get(102)
+    assert pkg_102 is not None
+    assert pkg_102["name"] == "Europa Plus"
+    assert pkg_102["data"] == "10 GB"
+    assert pkg_102["validity"] == "30 dias"
+
+    pkg_301 = pkg_mgr.get(301)
+    assert pkg_301 is not None
+    assert pkg_301["name"] == "Global"
+    assert pkg_301["data"] == "20 GB"
+    assert pkg_301["validity"] == "30 dias"
+
+    c = {**sample_client, "id": 58372, "pkg": 102, "status": "ativo"}
+    manager.create(c)
+
+    conn_mgr = ConnectivityManager(client_manager=manager, packages_mgr=pkg_mgr)
+    result = conn_mgr.check(58372, "IT")
+    assert result is not None
+    assert result["client"]["pkg"] == 102
+    assert result["client"]["pkg_name"] == "Europa Plus"
+    assert result["client"]["pkg_data"] == "10 GB"
+    assert result["client"]["pkg_validity"] == "30 dias"
+
+
+def test_packages_rendered_via_jinja():
+    from run import app
+
+    client = app.test_client()
+    for route in ("/", "/admin/", "/session"):
+        resp = client.get(route)
+        assert resp.status_code == 200
+        html = resp.get_data(as_text=True)
+        assert "101 — Europa Basic (5 GB • 15 dias)" in html
+        assert "102 — Europa Plus (10 GB • 30 dias)" in html
+        assert "301 — Global (20 GB • 30 dias)" in html
