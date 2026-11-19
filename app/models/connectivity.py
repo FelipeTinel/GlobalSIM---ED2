@@ -13,49 +13,58 @@ PACKAGE_NAMES: dict[int, str] = {
     203: "Regional Asia-Pacific (10 GB)",
 }
 
-
 class ConnectivityManager:
+
     def __init__(
         self,
         client_manager: ClientManager | None = None,
-        countries_manager: CountriesManager | None = None
+        countries_manager: CountriesManager | None = None,
     ):
         self.client_manager = client_manager or ClientManager()
         self.countries_manager = countries_manager or CountriesManager()
 
+    def _evaluate_connectivity(
+        self, client: dict[str, Any], country: dict[str, Any] | None, code: str
+    ) -> dict[str, Any]:
+        is_client_active = (client.get("status") or "").lower() == "ativo"
+
+        if not is_client_active:
+            return {
+                "status": "inactive",
+                "label": "eSIM Inativo",
+                "message": f"O eSIM ({client.get('esim')}) de {client.get('name')} está inativo. Ative sua linha antes de viajar.",
+                "guaranteed": False,
+            }
+
+        if not country:
+            return {
+                "status": "unavailable",
+                "label": "Sem Cobertura no Destino",
+                "message": f"O destino '{code}' não possui cobertura disponível na rede GlobalSIM.",
+                "guaranteed": False,
+            }
+
+        return {
+            "status": "guaranteed",
+            "label": "Conectividade Garantida!",
+            "message": f"O plano de {client.get('name')} funcionará normalmente em {country.get('country')} via rede {country.get('tech')} da operadora {country.get('provider')}.",
+            "guaranteed": True,
+        }
+
     def check(self, client_id: int, country_code: str) -> dict[str, Any] | None:
+
         code = country_code.strip().upper()
 
-        # 1. Árvore B: Busca do cliente pelo ID em O(log n)
         client = self.client_manager.get(client_id)
         if not client:
             return None
 
         btree_inst = self.client_manager.get_instrumentation()
 
-        # 2. Tabela Hash: Busca do país de destino pelo código em O(1) médio
         country = self.countries_manager.get(code)
         hash_inst = self.countries_manager.get_instrumentation()
 
-        # 3. Consolidação de Conectividade
-        is_client_active = (client.get("status") or "").lower() == "ativo"
-        has_coverage = country is not None
-
-        if not is_client_active:
-            status_key = "inactive"
-            status_label = "eSIM Inativo"
-            guaranteed = False
-            message = f"O eSIM ({client.get('esim')}) de {client.get('name')} está inativo. Ative sua linha antes de viajar."
-        elif not has_coverage:
-            status_key = "unavailable"
-            status_label = "Sem Cobertura no Destino"
-            guaranteed = False
-            message = f"O destino '{code}' não possui cobertura disponível na rede GlobalSIM."
-        else:
-            status_key = "guaranteed"
-            status_label = "Conectividade Garantida!"
-            guaranteed = True
-            message = f"O plano de {client.get('name')} funcionará normalmente em {country.get('country')} via rede {country.get('tech')} da operadora {country.get('provider')}."
+        connectivity_info = self._evaluate_connectivity(client, country, code)
 
         pkg_code = client.get("pkg")
         pkg_name = PACKAGE_NAMES.get(pkg_code, f"Pacote #{pkg_code}")
@@ -73,7 +82,7 @@ class ConnectivityManager:
                     "key": btree_inst.get("last_search_key"),
                     "comparisons": btree_inst.get("last_search_comparisons"),
                     "nodes_visited": btree_inst.get("last_search_nodes_visited"),
-                }
+                },
             },
             "destination": {
                 "code": country.get("code", code).upper() if country else code,
@@ -81,16 +90,11 @@ class ConnectivityManager:
                 "continent": country.get("continent") if country else None,
                 "provider": country.get("provider") if country else None,
                 "tech": country.get("tech") if country else None,
-                "available": has_coverage,
+                "available": country is not None,
                 "hash_search": {
                     "bucket": hash_inst.get("last_search_bucket"),
                     "comparisons": hash_inst.get("last_search_comparisons"),
-                }
+                },
             },
-            "connectivity": {
-                "status": status_key,
-                "label": status_label,
-                "message": message,
-                "guaranteed": guaranteed,
-            }
+            "connectivity": connectivity_info,
         }
