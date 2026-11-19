@@ -1,14 +1,35 @@
 from flask import Blueprint, render_template, request, jsonify
 from app.models.client import ClientManager, Client
+from app.models.package import packages_manager
 
 clients_bp = Blueprint('client', __name__)
 client_manager = ClientManager()
 
 
+def _enrich_client_package(client: dict) -> dict:
+    enriched = dict(client)
+    pkg_info = packages_manager.get(enriched.get("pkg"))
+    if pkg_info:
+        enriched["pkg_name"] = pkg_info["name"]
+        enriched["pkg_data"] = pkg_info["data"]
+        enriched["pkg_validity"] = pkg_info["validity"]
+    else:
+        pkg_code = enriched.get("pkg")
+        enriched["pkg_name"] = f"Pacote #{pkg_code}" if pkg_code else "Não associado"
+        enriched["pkg_data"] = "—"
+        enriched["pkg_validity"] = "—"
+    return enriched
+
+
 @clients_bp.route('/session', methods=['GET'])
 @clients_bp.route('/login', methods=['GET'])
 def session_page():
-    return render_template('session.html')
+    return render_template('session.html', packages=packages_manager.get_all())
+
+
+@clients_bp.route('/packages', methods=['GET'])
+def get_all_packages():
+    return jsonify(packages_manager.get_all()), 200
 
 
 @clients_bp.route('/clients', methods=['GET'])
@@ -28,7 +49,7 @@ def get_client(client_id: int):
     if "is_logged" not in client:
         client["is_logged"] = False
 
-    return jsonify(client), 200
+    return jsonify(_enrich_client_package(client)), 200
 
 
 @clients_bp.route('/clients', methods=['POST'])
@@ -66,7 +87,7 @@ def create_client():
             "is_logged": is_logged,
         }
         client_manager.create(client_data)
-        return jsonify(client_data), 201
+        return jsonify(_enrich_client_package(client_data)), 201
     except ValueError as err:
         return jsonify({"error": str(err)}), 400
 
@@ -102,7 +123,7 @@ def update_client(client_id: int):
             "is_logged": is_logged,
         }
         client_manager.update(client_id, updated_client)
-        return jsonify(updated_client), 200
+        return jsonify(_enrich_client_package(updated_client)), 200
     except (KeyError, ValueError) as err:
         return jsonify({"error": str(err)}), 400
 
