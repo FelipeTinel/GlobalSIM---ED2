@@ -26,7 +26,7 @@ SURNAMES = [
     "Tinel", "Schubach", "Restovic"
 ]
 
-DEFAULT_PACKAGES = [101, 102, 103, 104, 105, 201, 202, 203]
+DEFAULT_PACKAGES = [101, 102, 103, 104, 105, 201, 202, 203, 301]
 STATUS_OPTIONS = ["ativo", "ativo", "ativo", "inativo"]
 
 
