@@ -336,12 +336,16 @@ function renderClientDetails(client) {
     const grid = document.createElement('div');
     grid.className = 'client-details-grid';
 
+    const pkgLabel = client.pkg_name
+        ? `${client.pkg_name} (${client.pkg_data} • ${client.pkg_validity}) [#${client.pkg}]`
+        : `Pacote #${client.pkg || 101}`;
+
     const fields = [
         ['ID do Cliente', `#${client.id}`],
         ['Nome Completo', client.name],
         ['E-mail', client.email || 'Não informado'],
         ['Código eSIM', client.esim || 'Não associado'],
-        ['Plano / Pacote', `Pacote #${client.pkg || 101}`],
+        ['Plano / Pacote', pkgLabel],
         ['Status do eSIM', client.status || 'ativo'],
         ['Sessão Ativa', client.is_logged ? 'Sim (Autenticado)' : 'Não (Desconectado)']
     ];

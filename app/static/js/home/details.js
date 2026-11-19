@@ -142,7 +142,8 @@ export function renderConnectivityResult(data) {
             <div><span class="lbl">Nome:</span> <span class="val">${client.name}</span></div>
             <div><span class="lbl">ID:</span> <span class="val">#${client.id}</span></div>
             <div><span class="lbl">eSIM:</span> <span class="val">${client.esim || '—'}</span></div>
-            <div><span class="lbl">Pacote:</span> <span class="val">${client.pkg_name}</span></div>
+            <div><span class="lbl">Pacote:</span> <span class="val">${client.pkg_name} (#${client.pkg})</span></div>
+            <div><span class="lbl">Dados / Validade:</span> <span class="val">${client.pkg_data || '—'} • ${client.pkg_validity || '—'}</span></div>
             <div><span class="lbl">Status da Linha:</span> <span class="val status-pill status-${client.status}">${(client.status || 'ativo').toUpperCase()}</span></div>
             <div class="structure-metric">
                 <i class="bi bi-speedometer2"></i> ${client.btree_search.comparisons} comparação(ões) / ${client.btree_search.nodes_visited} nó(s) inspecionado(s)

@@ -55,7 +55,11 @@ export async function renderSessionStatus(elements) {
         if (userIdEl) userIdEl.textContent = session.client.id;
         if (userEmailEl) userEmailEl.textContent = session.client.email || 'Não informado';
         if (userEsimEl) userEsimEl.textContent = session.client.esim || 'Não associado';
-        if (userPkgEl) userPkgEl.textContent = session.client.pkg ? `Pacote #${session.client.pkg}` : 'Padrão';
+        if (userPkgEl) {
+            userPkgEl.textContent = session.client.pkg_name
+                ? `${session.client.pkg_name} (${session.client.pkg_data} • ${session.client.pkg_validity})`
+                : (session.client.pkg ? `Pacote #${session.client.pkg}` : 'Padrão');
+        }
         if (logoutBtn) logoutBtn.hidden = false;
 
     } else if (session.state === 'logged_out') {

@@ -76,7 +76,13 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="home-client-pkg" class="form-label">Plano / Pacote (pkg):</label>
-                        <input type="number" id="home-client-pkg" class="form-input" value="101" required />
+                        <select id="home-client-pkg" class="form-select" required>
+                            {% for pkg in packages %}
+                            <option value="{{ pkg.code }}" {% if pkg.code == 101 %}selected{% endif %}>
+                                {{ pkg.code }} — {{ pkg.name }} ({{ pkg.data }} • {{ pkg.validity }})
+                            </option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="home-client-status" class="form-label">Status do eSIM:</label>
