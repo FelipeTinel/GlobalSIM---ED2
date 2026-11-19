@@ -3,10 +3,10 @@
  */
 
 import { state } from './state.js';
-import { getCountries, fetchCountryDetails } from './api.js';
+import { getCountries, fetchCountryDetails, checkConnectivity } from './api.js';
 import { initMap, renderMarkers, focusCountry } from './map.js';
 import { renderList, markActive } from './list.js';
-import { renderCoverageAvailable, renderCoverageUnavailable, renderPlaceholder } from './details.js';
+import { renderCoverageAvailable, renderCoverageUnavailable, renderPlaceholder, renderConnectivityResult } from './details.js';
 import { checkSession, register } from '../session/auth.js';
 
 export function findCountryKey(code) {
@@ -65,8 +65,13 @@ export async function checkCoverageByCode(rawCode) {
 }
 
 export async function selectCountry(countryId) {
+    const connCountryInput = document.getElementById('conn-country-code');
+    if (connCountryInput) {
+        connCountryInput.value = countryId.toUpperCase();
+    }
     await checkCoverageByCode(countryId);
 }
+
 
 export async function initHome() {
     const point = window.initialPoint || { lat: 0, lng: 0, zoom: 4 };
@@ -105,7 +110,85 @@ export async function initHome() {
     }
 
     initAccountModal();
+    initConnectivityFeature();
 }
+
+function initConnectivityFeature() {
+    const tabCountries = document.getElementById('tab-home-countries');
+    const tabConnectivity = document.getElementById('tab-home-connectivity');
+    const secCountries = document.getElementById('sidebar-section-countries');
+    const secConnectivity = document.getElementById('sidebar-section-connectivity');
+
+    const form = document.getElementById('connectivity-form');
+    const inputClient = document.getElementById('conn-client-id');
+    const inputCountry = document.getElementById('conn-country-code');
+    const btnQuickId = document.getElementById('btn-use-logged-user');
+    const quickIdSpan = document.getElementById('quick-fill-id');
+
+    // Alternador de abas da Sidebar
+    tabCountries?.addEventListener('click', () => {
+        tabCountries.classList.add('active');
+        tabConnectivity?.classList.remove('active');
+        secCountries?.removeAttribute('hidden');
+        secConnectivity?.setAttribute('hidden', '');
+    });
+
+    tabConnectivity?.addEventListener('click', () => {
+        tabConnectivity.classList.add('active');
+        tabCountries?.classList.remove('active');
+        secConnectivity?.removeAttribute('hidden');
+        secCountries?.setAttribute('hidden', '');
+    });
+
+    // Auto-preenchimento com usuário da sessão
+    checkSession().then(session => {
+        if (session.state === 'logged_in' && session.client) {
+            if (inputClient && !inputClient.value) {
+                inputClient.value = session.client.id;
+            }
+            if (btnQuickId && quickIdSpan) {
+                quickIdSpan.textContent = session.client.id;
+                btnQuickId.style.display = 'inline-flex';
+                btnQuickId.addEventListener('click', () => {
+                    if (inputClient) inputClient.value = session.client.id;
+                });
+            }
+        }
+    }).catch(e => console.warn('Erro ao checar sessão para conectividade:', e));
+
+    // Submissão da consulta integrada
+    form?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const clientId = inputClient?.value?.trim();
+        const countryCode = inputCountry?.value?.trim();
+
+        if (!clientId || !countryCode) return;
+
+        renderPlaceholder('Consultando Árvore B (Cliente) e Tabela Hash (Destino)...');
+
+        const { ok, data } = await checkConnectivity(clientId, countryCode);
+
+        const detailsPanel = document.getElementById('details-panel');
+        if (ok && data) {
+            renderConnectivityResult(data);
+        } else {
+            if (detailsPanel) {
+                detailsPanel.innerHTML = `
+                    <div class="details-header-row">
+                        <h2>Consulta de Viagem & Conectividade</h2>
+                        <span class="coverage-badge unavailable">ERRO NA CONSULTA</span>
+                    </div>
+                    <p class="placeholder" style="color: #f87171;">
+                        <i class="bi bi-exclamation-triangle-fill"></i> ${data?.error || 'Não foi possível realizar a consulta integrada.'}
+                    </p>
+                `;
+            }
+        }
+
+        detailsPanel?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+}
+
 
 async function initAccountModal() {
     const accountBtnText = document.getElementById('account-btn-text');

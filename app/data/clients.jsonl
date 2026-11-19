@@ -998,3 +998,4 @@
 {"id": 47155, "name": "Maria Nunes", "email": "maria.nunes155@email.com", "esim": "ESIM-91869", "pkg": 102, "country": "BR", "status": "ativo"}
 {"id": 54246, "name": "Eduardo Pereira", "email": "eduardo.pereira246@email.com", "esim": "ESIM-41663", "pkg": 103, "country": "IT", "status": "ativo"}
 {"id": 24323, "name": "Carlos Vieira", "email": "carlos.vieira323@email.com", "esim": "ESIM-99028", "pkg": 103, "country": "CA", "status": "ativo"}
+{"id": 16961, "name": "lipe", "email": "e@gmail", "esim": "ESIM-111", "pkg": 101, "country": "", "status": "ativo", "is_logged": true}
