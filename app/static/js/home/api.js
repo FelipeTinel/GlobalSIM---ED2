@@ -25,3 +25,14 @@ export async function fetchCountryDetails(countryId) {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return { found: true, data };
 }
+
+export async function checkConnectivity(clientId, countryCode) {
+    const url = `/api/connectivity?client_id=${encodeURIComponent(clientId)}&country_code=${encodeURIComponent(countryCode)}`;
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await response.json().catch(() => ({}));
+    return { ok: response.ok, status: response.status, data };
+}
+

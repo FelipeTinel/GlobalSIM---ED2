@@ -1,8 +1,14 @@
 from app.models.country import CountriesManager
+from app.models.connectivity import ConnectivityManager
+from app.routes.client import client_manager
 from flask import Blueprint, render_template, request, jsonify
 
 home_bp = Blueprint('home', __name__)
 countries_manager = CountriesManager()
+connectivity_manager = ConnectivityManager(
+    client_manager=client_manager,
+    countries_manager=countries_manager
+)
 
 initial_point = {"lat": -12.9714, "lng": -38.5014, "zoom": 13}
 
@@ -57,6 +63,7 @@ def list_countries():
 
     return jsonify(response), 200
 
+
 @home_bp.route('/api/countries/<string:country_id>', methods=['GET'])
 def get_country(country_id):
     # Retorno de todas as informações do país ID selecionado e métricas de busca.
@@ -82,5 +89,30 @@ def get_country(country_id):
     }
 
     return jsonify(response), 200
+
+
+@home_bp.route('/api/connectivity', methods=['GET'])
+def check_connectivity():
+    raw_client_id = request.args.get('client_id', '').strip()
+    country_code = request.args.get('country_code', '').strip().upper()
+
+    if not raw_client_id or not country_code:
+        return jsonify({"error": "Parâmetros 'client_id' e 'country_code' são obrigatórios."}), 400
+
+    try:
+        client_id = int(raw_client_id)
+    except ValueError:
+        return jsonify({"error": "O 'client_id' deve ser um número inteiro."}), 400
+
+    result = connectivity_manager.check(client_id, country_code)
+    if not result:
+        return jsonify({
+            "error": f"Cliente com ID {client_id} não encontrado na Árvore B.",
+            "client_found": False
+        }), 404
+
+    return jsonify(result), 200
+
+
 
 
